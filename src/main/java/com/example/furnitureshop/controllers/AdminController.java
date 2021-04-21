@@ -3,6 +3,7 @@ package com.example.furnitureshop.controllers;
 import com.example.furnitureshop.models.Order;
 import com.example.furnitureshop.security.services.FurnitureService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -18,23 +19,18 @@ public class AdminController {
     @Autowired
     private FurnitureService furnitureService;
 
-//    @GetMapping(value = "/")
-//    public String getorde(){
-//        return "its admin orders";
-//    }
-
     @GetMapping(value = "/")
-    public List<Order> getOrders() {
-        return furnitureService.getAllOrders();
+    public ResponseEntity<?> getOrders() {
+        return new ResponseEntity<>(furnitureService.getAllOrders(), HttpStatus.OK);
     }
 
     @PatchMapping(value = "/{orderId}")
-    public ResponseEntity<Order> updateOrder(@PathVariable Long orderId, @RequestBody Map<Object, Object> order){
-        return furnitureService.updateOrder(orderId, order);
+    public ResponseEntity<?> updateOrder(@PathVariable Long orderId, @RequestBody Order orderDetails){
+        return new ResponseEntity<>(furnitureService.updateOrder(orderId, orderDetails), HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{orderId}")
-    public ResponseEntity<String> deleteOrder(@PathVariable Long orderId){
-        return furnitureService.deleteOrder(orderId);
+    public ResponseEntity<?> deleteOrder(@PathVariable Long orderId){
+        return new ResponseEntity<>(furnitureService.deleteOrder(orderId), HttpStatus.ACCEPTED);
     }
 }

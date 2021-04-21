@@ -1,9 +1,7 @@
 package com.example.furnitureshop.controllers;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -71,7 +69,7 @@ public class AuthController {
                 .collect(Collectors.toList());
 
         for(String role: roles){
-            System.out.println(role);
+            System.out.println(role + " " + jwt);
         }
 
         return ResponseEntity.ok(new JwtResponse(jwt, userDetails.getId(), userDetails.getUsername(),
@@ -99,7 +97,9 @@ public class AuthController {
         }
 
         // Create new user's account
-        User user = new User(signUpRequest.getEmpId(), signUpRequest.getEmpFirstName(), signUpRequest.getEmpLastName(),
+        User user = new User(signUpRequest.getEmpId(),
+                signUpRequest.getEmpFirstName().substring(0, 1).toUpperCase() + signUpRequest.getEmpFirstName().substring(1).toLowerCase(),
+                signUpRequest.getEmpLastName().substring(0, 1).toUpperCase() + signUpRequest.getEmpLastName().substring(1).toLowerCase(),
                 signUpRequest.getEmpUsername(), signUpRequest.getEmail(),
                 passwordEncoder.encode(signUpRequest.getEmpPassword()));
 

@@ -1,19 +1,15 @@
 package com.example.furnitureshop.security.services;
 
-import java.lang.reflect.Field;
-import java.util.List;
-import java.util.Map;
-
 import com.example.furnitureshop.GlobalClassForFunctions;
 import com.example.furnitureshop.exceptions.ResourceNotFoundException;
 import com.example.furnitureshop.models.Order;
-import com.example.furnitureshop.models.User;
+import com.example.furnitureshop.payload.response.MessageResponse;
 import com.example.furnitureshop.repository.FurnitureRepository;
 import com.example.furnitureshop.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ReflectionUtils;
 
 
 @Service
@@ -26,87 +22,68 @@ public class FurnitureService {
     private UserRepository userRepository;
 
     //GET ALL THE ORDERS
-    public List<Order> getAllOrders(){
-        return furnitureRepository.findAll();
+    public ResponseEntity<?> getAllOrders(){
+        return new ResponseEntity<>(furnitureRepository.findAll(), HttpStatus.OK);
+    }
+
+    //GET ALL ORDERS FOR VENDOR
+    public ResponseEntity<?> getAllOrdersForVendor() {
+        return new ResponseEntity<>(furnitureRepository.findOrdersForVendor(), HttpStatus.OK);
     }
 
     //GET ORDER BY EMP ID
-    public List<Order> getOrderByEmpId(long empId){
-        return furnitureRepository.findUserByEmpId(empId);
-
-//		List<Order> empOrderList = new ArrayList<Order>();
-//		furnitureRepository.findAll().stream()
-//		.forEach((order) -> {
-//			if(order.getEmpId() == empId) {
-//				System.out.print(order.getOrderId() + " ");
-//				empOrderList.add(order);
-//			}
-//		});
-//		Collections.sort(empOrderList, new GlobalClassForFunctions.SortByDate());
-//		return empOrderList;
-    }
-
-    //CREATE AN ORDER
-    public Order createOrder(Order order) {
-        order.setRejectedByAdmin(false);
-
-        String currentDateAndTime = GlobalClassForFunctions.getCurrentDateAndTime(System.currentTimeMillis());
-        order.setOrderDate(currentDateAndTime);
-
-        Order createdOrder = furnitureRepository.save(order);
-        return createdOrder;
+    public ResponseEntity<?> getOrderByEmpId(long empId){
+        return new ResponseEntity<>(furnitureRepository.findUserByEmpId(empId), HttpStatus.OK);
     }
 
     //GET SINGLE ORDER
-    public ResponseEntity<Order> getSingleOrder(Long orderId) {
+    public ResponseEntity<?> getSingleOrder(Long orderId) {
         Order order = furnitureRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + orderId));
-        return ResponseEntity.ok(order);
+        ResponseEntity.status(HttpStatus.BAD_REQUEST).body("no ");
+        return new ResponseEntity<>(order, HttpStatus.OK);
     }
 
-    //UPDATE ORDER USING PUT
-//	public ResponseEntity<Order> updateOrder(Long orderId, Order newOrder){
-//		Order oldOrder = furnitureRepository.findById(orderId)
-//				.orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + orderId));
-//		oldOrder.setEmpId(newOrder.getEmpId());
-//		oldOrder.setEmpName(newOrder.getEmpName());
-//		oldOrder.setEmail(newOrder.getEmail());
-//		oldOrder.setItemRequested(newOrder.getItemRequested());
-//		oldOrder.setQty(newOrder.getQty());
-//		oldOrder.setShippingAddress(newOrder.getShippingAddress());
-//		oldOrder.setPhnNo(newOrder.getPhnNo());
-//		Order updatedOrder = furnitureRepository.save(oldOrder);
-//		return ResponseEntity.ok(updatedOrder);
-//	}
+    //CREATE AN ORDER
+    public ResponseEntity<?> createOrder(Order order) {
+        order.setIsRejectedByAdmin(0);
+        order.setOrderDate(GlobalClassForFunctions.getCurrentDateAndTime());
+        return new ResponseEntity<>(furnitureRepository.save(order), HttpStatus.CREATED);
+    }
 
-    //UPDATE ORDER
-    public ResponseEntity<Order> updateOrder(Long id, Map<Object, Object> orderDetails) {
+    //UPDATE ORDER BY ADMIN
+    public ResponseEntity<?> updateOrder(Long id, Order orderDetails) {
         Order order = furnitureRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not exist with id :" + id));
-        orderDetails.forEach((k, v) -> {
-            Field fields = ReflectionUtils.findField(Order.class, (String) k);
-            assert fields != null;
-            fields.setAccessible(true);
-            ReflectionUtils.setField(fields, order, v);
-        });
+        order.setIsRejectedByAdmin(orderDetails.getIsRejectedByAdmin());
+        order.setQty(orderDetails.getQty());
         Order updatedOrder = furnitureRepository.save(order);
-        return ResponseEntity.ok(updatedOrder);
+        return new ResponseEntity<>(updatedOrder, HttpStatus.ACCEPTED);
+    }
+
+    //UPDATE ORDER BY VENDOR
+    public ResponseEntity<?> updateOrderByVendor(long orderId, Order orderDetails){
+        Order order = furnitureRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not exist with id :" + orderId));
+        order.setShippedDate(GlobalClassForFunctions.getCurrentDateAndTime());
+        return new ResponseEntity<>(furnitureRepository.save(order), HttpStatus.ACCEPTED);
     }
 
     //DELETE ORDER
-    public ResponseEntity<String> deleteOrder(Long orderId) {
+    public ResponseEntity<?> deleteOrder(Long orderId) {
         Order order = furnitureRepository.findById(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + orderId));
+                .orElseThrow();
         furnitureRepository.delete(order);
-        return ResponseEntity.ok("true");
+        return new ResponseEntity<>(new MessageResponse("Order was deleted successfully."), HttpStatus.ACCEPTED);
     }
 
     //RETURN EMPLOYEE ID FOR USERNAME
-    public ResponseEntity<Long> findEmpIdByUsername(String username){
-        return ResponseEntity.ok(furnitureRepository.findEmpIdByUsername(username));
+    public ResponseEntity<?> findEmpIdByUsername(String username){
+        return new ResponseEntity<>(userRepository.findEmpIdByUsername(username), HttpStatus.OK);
     }
 
-    public ResponseEntity<User> findByEmpId(long empId) {
-        return ResponseEntity.ok(userRepository.findByEmpId(empId));
+    //RETURN USER OBJECT FROM EMPLOYEE ID
+    public ResponseEntity<?> findByEmpId(long empId) {
+        return new ResponseEntity<>(userRepository.findByEmpId(empId), HttpStatus.OK);
     }
 }

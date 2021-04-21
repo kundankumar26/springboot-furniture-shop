@@ -3,9 +3,11 @@ package com.example.furnitureshop.security.jwt;
 
 import java.util.Date;
 
+import com.example.furnitureshop.repository.UserRepository;
 import com.example.furnitureshop.security.services.UserDetailsImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -22,11 +24,15 @@ public class JwtUtils {
     @Value("${example.app.jwtExpirationMs}")
     private int jwtExpirationMs;
 
+    @Autowired
+    UserRepository userRepository;
+
     public String generateJwtToken(Authentication authentication) {
 
         UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
 
         return Jwts.builder()
+                .setHeaderParam("empId", userRepository.findEmpIdByUsername(userPrincipal.getUsername()))
                 .setSubject((userPrincipal.getUsername()))
                 .setIssuedAt(new Date())
                 .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))

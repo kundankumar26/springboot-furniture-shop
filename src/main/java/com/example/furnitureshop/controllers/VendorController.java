@@ -3,13 +3,12 @@ package com.example.furnitureshop.controllers;
 import com.example.furnitureshop.models.Order;
 import com.example.furnitureshop.security.services.FurnitureService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Map;
+
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -19,13 +18,13 @@ public class VendorController {
     @Autowired
     private FurnitureService furnitureService;
 
-//    @GetMapping(value = "/")
-//    public String getorder(){
-//        return "its vendor orders";
-//    }
-
     @GetMapping(value = "/")
-    public List<Order> getOrders() {
-        return furnitureService.getAllOrders();
+    public ResponseEntity<?> getOrders() {
+        return new ResponseEntity<>(furnitureService.getAllOrdersForVendor(), HttpStatus.OK);
+    }
+
+    @PatchMapping(value = "/{orderId}")
+    public ResponseEntity<?> updateDateOfOrder(@PathVariable long orderId, @RequestBody Order orderDetails){
+        return new ResponseEntity<>(furnitureService.updateOrderByVendor(orderId, orderDetails), HttpStatus.ACCEPTED);
     }
 }

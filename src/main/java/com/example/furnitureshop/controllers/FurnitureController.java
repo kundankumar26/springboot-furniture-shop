@@ -16,35 +16,35 @@ public class FurnitureController {
 
     @Autowired
     private FurnitureService furnitureService;
+//
+//    @GetMapping(value = "/")
+//    public List<Order> getOrders() {
+//        return (List<Order>) furnitureService.getAllOrders();
+//    }
+//
+//    @PostMapping(value = "/")
+//    public ResponseEntity<Order> createOrder(@RequestBody Order order) {
+//        return furnitureService.createOrder(order);
+//    }
+//
+//    @GetMapping(value = "/emp/{empId}")
+//    public List<Order> getOrderByEmpId(@PathVariable Long empId){
+//        return (List<Order>) furnitureService.getOrderByEmpId(empId);
+//    }
+//
+//    @GetMapping(value = "/{orderId}")
+//    public ResponseEntity<Order> getOneOrder(@PathVariable Long orderId) {
+//        return furnitureService.getSingleOrder(orderId);
+//    }
+//
+//    @PatchMapping(value = "/{orderId}")
+//    public ResponseEntity<Order> updateOrder(@PathVariable Long orderId, @RequestBody Map<Object, Object> order){
+//        return furnitureService.updateOrder(orderId, order);
+//    }
 
-    @GetMapping(value = "/")
-    public List<Order> getOrders() {
-        return furnitureService.getAllOrders();
-    }
-
-    @PostMapping(value = "/")
-    public Order createOrder(@RequestBody Order order) {
-        return furnitureService.createOrder(order);
-    }
-
-    @GetMapping(value = "/emp/{empId}")
-    public List<Order> getOrderByEmpId(@PathVariable Long empId){
-        return furnitureService.getOrderByEmpId(empId);
-    }
-
-    @GetMapping(value = "/{orderId}")
-    public ResponseEntity<Order> getOneOrder(@PathVariable Long orderId) {
-        return furnitureService.getSingleOrder(orderId);
-    }
-
-    @PatchMapping(value = "/{orderId}")
-    public ResponseEntity<Order> updateOrder(@PathVariable Long orderId, @RequestBody Map<Object, Object> order){
-        return furnitureService.updateOrder(orderId, order);
-    }
-
-    @DeleteMapping(value = "/{orderId}")
-    public ResponseEntity<String> deleteOrder(@PathVariable Long orderId){
-        return furnitureService.deleteOrder(orderId);
-    }
+//    @DeleteMapping(value = "/{orderId}")
+//    public ResponseEntity<String> deleteOrder(@PathVariable Long orderId){
+//        return furnitureService.deleteOrder(orderId);
+//    }
 
 }

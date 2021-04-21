@@ -7,6 +7,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name="furniture")
@@ -20,30 +23,42 @@ public class Order {
     @Email
     private String email;
     private String itemRequested;
+    @NotNull
+    @NotBlank
     private long qty;
+    @NotNull
+    @NotBlank
     private String shippingAddress;
+    @NotBlank
+    private String shippedDate;
+    @NotNull
+    @NotBlank
     private long phnNo;
     private String orderDate;
-    private boolean isRejectedByAdmin;
-
+    //0 - For employee and admin
+    //1 - For employee, vendor and admin
+    //2 - For admin
+    private int isRejectedByAdmin;
 
     public Order(){
 
     }
 
-    public Order(long empId, String empName, @Email String email, String itemRequested, long qty,
-                 String shippingAddress, long phnNo, String orderDate,
-                 boolean rejectedByAdmin) {
-        super();
+    public Order(long empId, String empName, @Email String email,
+                 String itemRequested, @NotNull @NotBlank long qty,
+                 @NotNull @NotBlank String shippingAddress,
+                 @NotBlank String shippedDate,
+                 @NotNull @NotBlank long phnNo, String orderDate, int isRejectedByAdmin) {
         this.empId = empId;
         this.empName = empName;
         this.email = email;
         this.itemRequested = itemRequested;
         this.qty = qty;
         this.shippingAddress = shippingAddress;
+        this.shippedDate = shippedDate;
         this.phnNo = phnNo;
         this.orderDate = orderDate;
-        this.isRejectedByAdmin=rejectedByAdmin;
+        this.isRejectedByAdmin = isRejectedByAdmin;
     }
 
     public long getOrderId() {
@@ -88,28 +103,28 @@ public class Order {
     public void setShippingAddress(String shippingAddress) {
         this.shippingAddress = shippingAddress;
     }
+    public String getShippedDate() {
+        return shippedDate;
+    }
+    public void setShippedDate(String shippedDate) {
+        this.shippedDate = shippedDate;
+    }
     public long getPhnNo() {
         return phnNo;
     }
     public void setPhnNo(long phnNo) {
         this.phnNo = phnNo;
     }
-
     public String getOrderDate() {
         return orderDate;
     }
-
     public void setOrderDate(String s) {
         this.orderDate = s;
     }
-
-    public boolean isRejectedByAdmin() {
+    public int getIsRejectedByAdmin() {
         return isRejectedByAdmin;
     }
-
-    public void setRejectedByAdmin(boolean isRejectedByAdmin) {
+    public void setIsRejectedByAdmin(int isRejectedByAdmin) {
         this.isRejectedByAdmin = isRejectedByAdmin;
     }
-
-
 }
