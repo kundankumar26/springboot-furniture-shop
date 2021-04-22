@@ -8,6 +8,7 @@ import com.example.furnitureshop.security.services.FurnitureService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -19,16 +20,25 @@ public class EmployeeController {
     @Autowired
     private FurnitureService furnitureService;
 
+    @Autowired
+    private JavaMailSender javaMailSender;
+
     @GetMapping(value = "/")
     public ModelAndView getOrders() {
         return new ModelAndView("redirect:/employee/" + getCurrentEmployeeId() + "/");
     }
 
     @GetMapping(value = "/{empId}")
-    public ResponseEntity<?> getOrderByEmpId(@PathVariable long empId){
-        long currentEmployeeId = getCurrentEmployeeId();
-        if(empId != currentEmployeeId){
-            return new ResponseEntity<>(new MessageResponse("Unauthorised Request"), HttpStatus.UNAUTHORIZED);
+    public ResponseEntity<?> getOrderByEmpId(@PathVariable String empId){
+        long empIdFromPath, currentEmployeeId;
+        try{
+            empIdFromPath = Long.parseLong(empId);
+            currentEmployeeId = getCurrentEmployeeId();
+        } catch (Exception e){
+            return new ResponseEntity<>(new MessageResponse("User Not Found with id: " + empId), HttpStatus.NOT_FOUND);
+        }
+        if(empIdFromPath != currentEmployeeId){
+            return new ResponseEntity<>(new MessageResponse("User Not Found with id: " + empIdFromPath), HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(furnitureService.getOrderByEmpId(currentEmployeeId), HttpStatus.OK);
     }
@@ -43,6 +53,7 @@ public class EmployeeController {
         order.setEmpId(currentEmployeeId);
         order.setEmpName(user.getEmpFirstName() + " " + user.getEmpLastName());
         order.setEmail(user.getEmail());
+        javaMailSender.send(GlobalClassForFunctions.sendEmailForOrder("alternate8989@gmail.com", "Order Created", "You ordered a product"));
         return new ResponseEntity<>(furnitureService.createOrder(order), HttpStatus.CREATED);
     }
 
@@ -51,11 +62,10 @@ public class EmployeeController {
         return new ResponseEntity<>(furnitureService.deleteOrder(orderId), HttpStatus.OK);
     }
 
-//    @RequestMapping(value = "/{path}", method = {RequestMethod.GET, RequestMethod.POST})
-//    public ResponseEntity<?> invalidPath(@PathVariable String path){
-//        System.out.println("invalid path");
-//        return new ResponseEntity<>(new MessageResponse("Invalid Path"), HttpStatus.BAD_REQUEST);
-//    }
+    @RequestMapping(value = "/{path}/{subpath}", method = {RequestMethod.GET, RequestMethod.POST})
+    public ResponseEntity<?> invalidPath(@PathVariable String path){
+        return new ResponseEntity<>(new MessageResponse("Invalid Path"), HttpStatus.BAD_REQUEST);
+    }
 
     private long getCurrentEmployeeId(){
         String username = GlobalClassForFunctions.getUserNameFromToken();
