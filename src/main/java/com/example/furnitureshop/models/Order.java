@@ -8,7 +8,6 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 @Entity
@@ -23,16 +22,12 @@ public class Order {
     @Email
     private String email;
     private String itemRequested;
-    @NotNull
     @NotBlank
     private long qty;
-    @NotNull
     @NotBlank
     private String shippingAddress;
     @NotBlank
     private String shippedDate;
-    @NotNull
-    @NotBlank
     private long phnNo;
     private String orderDate;
     //0 - For employee and admin

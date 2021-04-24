@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.MessagingException;
+
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -36,15 +38,21 @@ public class VendorController {
     }
 
     @PatchMapping(value = "/{orderId}")
-    public ResponseEntity<?> updateDateOfOrder(@PathVariable long orderId, @RequestBody Order orderDetails){
-        ResponseEntity<?> responseEntity = null;
+    public ResponseEntity<?> updateDateOfOrder(@PathVariable long orderId, @RequestBody Order orderDetails) {
+        Order updatedOrder = null;
+        StringBuilder ordersStringBuilder = new StringBuilder();
         try{
-            responseEntity = furnitureService.updateOrderByVendor(orderId, orderDetails);
+            updatedOrder = furnitureService.updateOrderByVendor(orderId, orderDetails);
+            ordersStringBuilder.append("<tr style=\"text-align: center\"><td>").append(updatedOrder.getOrderId()).append("</td>").append("<td>").append(updatedOrder.getItemRequested()).append("</td>");
+            ordersStringBuilder.append("<td>").append(updatedOrder.getQty()).append("</td>").append("<td>").append(updatedOrder.getShippingAddress()).append("</td>");
+            ordersStringBuilder.append("<td>").append(updatedOrder.getPhnNo()).append("</td>").append("<td>").append(updatedOrder.getShippedDate().substring(0, 11)).append("</td></tr>");
+
+            javaMailSender.send(GlobalClassForFunctions.sendEmailForOrder(javaMailSender.createMimeMessage(), "alternate8989@gmail.com", "Order confirmed successfully.",
+                    "confirmed", ordersStringBuilder, "user.getEmpFirstName() + " + " + user.getEmpLastName()"));
         } catch (Exception e) {
             return new ResponseEntity<>(new MessageResponse("Order cannot be updated"), HttpStatus.BAD_REQUEST);
         }
-        javaMailSender.send(GlobalClassForFunctions.sendEmailForOrder("alternate8989@gmail.com", "Order Confirmed", "Hey your order is confirmed"));
-        return new ResponseEntity<>(responseEntity, HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(updatedOrder, HttpStatus.ACCEPTED);
     }
 
     @RequestMapping(value = "/{path}", method = {RequestMethod.GET, RequestMethod.POST})

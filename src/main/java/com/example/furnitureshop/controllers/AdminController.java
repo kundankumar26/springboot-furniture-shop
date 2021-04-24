@@ -1,6 +1,8 @@
 package com.example.furnitureshop.controllers;
 
+import com.example.furnitureshop.exceptions.ResourceNotFoundException;
 import com.example.furnitureshop.models.Order;
+import com.example.furnitureshop.payload.response.MessageResponse;
 import com.example.furnitureshop.security.services.FurnitureService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,16 +20,34 @@ public class AdminController {
 
     @GetMapping(value = "/")
     public ResponseEntity<?> getOrders() {
-        return new ResponseEntity<>(furnitureService.getAllOrders(), HttpStatus.OK);
+        ResponseEntity<?> responseEntity;
+        try{
+            responseEntity = furnitureService.getAllOrders();
+        } catch(Exception e){
+            return new ResponseEntity<>(new ResourceNotFoundException("Cannot get the orders"), HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(responseEntity, HttpStatus.OK);
     }
 
     @PatchMapping(value = "/{orderId}")
     public ResponseEntity<?> updateOrder(@PathVariable Long orderId, @RequestBody Order orderDetails){
-        return new ResponseEntity<>(furnitureService.updateOrder(orderId, orderDetails), HttpStatus.OK);
+        ResponseEntity<?> responseEntity;
+        try{
+            responseEntity = furnitureService.updateOrder(orderId, orderDetails);
+        } catch(Exception e){
+            return new ResponseEntity<>(new MessageResponse("Order cannot be updated"), HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(responseEntity, HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{orderId}")
     public ResponseEntity<?> deleteOrder(@PathVariable Long orderId){
-        return new ResponseEntity<>(furnitureService.deleteOrder(orderId), HttpStatus.ACCEPTED);
+        ResponseEntity<?> responseEntity;
+        try{
+            responseEntity = furnitureService.deleteOrder(orderId);
+        } catch(Exception e){
+            return new ResponseEntity<>(new MessageResponse("Order cannot be deleted"), HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(responseEntity, HttpStatus.ACCEPTED);
     }
 }

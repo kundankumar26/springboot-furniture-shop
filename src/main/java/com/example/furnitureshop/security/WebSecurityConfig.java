@@ -1,6 +1,5 @@
 package com.example.furnitureshop.security;
 
-
 import com.example.furnitureshop.security.jwt.AuthEntryPointJwt;
 import com.example.furnitureshop.security.jwt.AuthTokenFilter;
 import com.example.furnitureshop.security.services.UserDetailsServiceImpl;
@@ -58,7 +57,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.cors().and().csrf().disable()
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .authorizeRequests().antMatchers("/api/auth/**").permitAll()
+                .authorizeRequests().antMatchers("/**").permitAll()
                 .antMatchers("/api/test/**").permitAll()
                 .antMatchers("/employee/**").hasAnyRole("EMPLOYEE")
                 .antMatchers("/vendor/**").hasAnyRole("VENDOR")

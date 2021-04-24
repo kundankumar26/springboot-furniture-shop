@@ -11,6 +11,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+
 
 @Service
 public class FurnitureService {
@@ -45,10 +50,12 @@ public class FurnitureService {
     }
 
     //CREATE AN ORDER
-    public ResponseEntity<?> createOrder(Order order) {
-        order.setIsRejectedByAdmin(0);
-        order.setOrderDate(GlobalClassForFunctions.getCurrentDateAndTime());
-        return new ResponseEntity<>(furnitureRepository.save(order), HttpStatus.CREATED);
+    public ResponseEntity<?> createOrder(List<Order> orderDetails) {
+        List<Order> createdOrders = new ArrayList<>();
+        for(Order order: orderDetails){
+            createdOrders.add(furnitureRepository.save(order));
+        }
+        return new ResponseEntity<>(createdOrders, HttpStatus.CREATED);
     }
 
     //UPDATE ORDER BY ADMIN
@@ -62,17 +69,18 @@ public class FurnitureService {
     }
 
     //UPDATE ORDER BY VENDOR
-    public ResponseEntity<?> updateOrderByVendor(long orderId, Order orderDetails){
+    public Order updateOrderByVendor(long orderId, Order orderDetails){
         Order order = furnitureRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not exist with id :" + orderId));
-        order.setShippedDate(GlobalClassForFunctions.getCurrentDateAndTime());
-        return new ResponseEntity<>(furnitureRepository.save(order), HttpStatus.ACCEPTED);
+        order.setShippedDate(GlobalClassForFunctions.getCurrentDateAndTime(orderDetails.getShippedDate()));
+        Order updatedOrder = furnitureRepository.save(order);
+        return updatedOrder;
     }
 
     //DELETE ORDER
     public ResponseEntity<?> deleteOrder(Long orderId) {
         Order order = furnitureRepository.findById(orderId)
-                .orElseThrow();
+                .orElseThrow(() -> new ResourceNotFoundException("Order cannot be deleted"));
         furnitureRepository.delete(order);
         return new ResponseEntity<>(new MessageResponse("Order was deleted successfully."), HttpStatus.ACCEPTED);
     }

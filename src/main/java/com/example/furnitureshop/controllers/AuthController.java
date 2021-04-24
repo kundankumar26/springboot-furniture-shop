@@ -1,10 +1,7 @@
 package com.example.furnitureshop.controllers;
 
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
-
-
 import com.example.furnitureshop.models.ERole;
 import com.example.furnitureshop.models.Role;
 import com.example.furnitureshop.models.User;
@@ -17,13 +14,12 @@ import com.example.furnitureshop.repository.UserRepository;
 import com.example.furnitureshop.security.jwt.JwtUtils;
 import com.example.furnitureshop.security.services.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,7 +32,7 @@ import javax.validation.Valid;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/")
 public class AuthController {
     @Autowired
     AuthenticationManager authenticationManager;
@@ -56,6 +52,7 @@ public class AuthController {
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
+        System.out.println(loginRequest.getUsername());
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
@@ -78,6 +75,7 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
+        //System.out.println(signUpRequest);
         if (userRepository.existsByUsername(signUpRequest.getEmpUsername())) {
             return ResponseEntity
                     .badRequest()
@@ -106,7 +104,6 @@ public class AuthController {
         String currentUserRole = signUpRequest.getRole();
         Set<String> strRoles = Collections.singleton(currentUserRole==null ? "false" : currentUserRole);
         Set<Role> roles = new HashSet<>();
-        System.out.println(signUpRequest.getRole());
 
         strRoles.forEach(role -> {
             if (role.equals("vendor")) {
@@ -124,8 +121,8 @@ public class AuthController {
 
         user.setRoles(roles);
         userRepository.save(user);
-
-        return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+        System.out.println(user);
+        return new ResponseEntity<>(new MessageResponse("User registered successfully!"), HttpStatus.CREATED);
     }
 }
 
