@@ -9,18 +9,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
+@PreAuthorize("hasRole('EMPLOYEE')")
 @RequestMapping("/employee")
 public class EmployeeController {
 
@@ -31,8 +30,14 @@ public class EmployeeController {
     private JavaMailSender javaMailSender;
 
     @GetMapping(value = "/")
-    public ModelAndView getOrders() {
-        return new ModelAndView("redirect:/employee/" + getCurrentEmployeeId() + "/");
+    public Object getOrders() {
+        long employeeId = -1;
+        try{
+            employeeId = getCurrentEmployeeId();
+        } catch(Exception e){
+            return new ResponseEntity<>(new MessageResponse("Not authorised"), HttpStatus.UNAUTHORIZED);
+        }
+        return new ModelAndView("redirect:/employee/" + employeeId + "/");
     }
 
     @GetMapping(value = "/{empId}")

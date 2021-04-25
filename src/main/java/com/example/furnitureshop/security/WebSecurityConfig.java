@@ -15,6 +15,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 
@@ -54,16 +55,28 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.cors().and().csrf().disable()
-                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .authorizeRequests().antMatchers("/**").permitAll()
-                .antMatchers("/api/test/**").permitAll()
-                .antMatchers("/employee/**").hasAnyRole("EMPLOYEE")
-                .antMatchers("/vendor/**").hasAnyRole("VENDOR")
-                .antMatchers("/admin/**").hasAnyRole("ADMIN")
-                .anyRequest().authenticated();
+//        http.cors().and().csrf().disable()
+//                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
+//                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+//                .authorizeRequests().antMatchers("/**").permitAll()
+//                .antMatchers("/api/test/**").permitAll()
+//                .antMatchers("/employee/**").hasAnyRole("EMPLOYEE")
+//                .antMatchers("/vendor/").hasAnyRole("ROLE_VENDOR")
+//                .antMatchers("/admin/**").hasAnyRole("ADMIN")
+//                .anyRequest().authenticated();
+        http.authorizeRequests((authorizeRequests) -> {
+                    authorizeRequests
+                            .antMatchers("/employee/**").hasAnyRole("EMPLOYEE")
+                            .antMatchers("/vendor/**").hasRole("VENDOR")
+                            .antMatchers("/admin/**").hasRole("ADMIN");
+                    })
+                .authorizeRequests().antMatchers("/signup").permitAll()
+                .antMatchers("/signin").permitAll().and()
+                .authorizeRequests().anyRequest().authenticated().and()
+                .cors().and().csrf().disable().exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
     }
+
 }
