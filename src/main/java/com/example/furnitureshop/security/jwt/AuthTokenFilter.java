@@ -44,7 +44,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
             else{
-                System.out.println("inside do filter method" + response);
+                System.out.println("inside dofilterinternal method" + response);
             }
         } catch (Exception e) {
             logger.error("Cannot set user authentication: {}", e);
