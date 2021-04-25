@@ -7,6 +7,10 @@ import com.example.furnitureshop.payload.response.MessageResponse;
 import com.example.furnitureshop.repository.FurnitureRepository;
 import com.example.furnitureshop.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -26,9 +30,15 @@ public class FurnitureService {
     @Autowired
     private UserRepository userRepository;
 
-    //GET ALL THE ORDERS
+
+    //GET ALL THE ORDERS USING PAGES
     public ResponseEntity<?> getAllOrders(){
         return new ResponseEntity<>(furnitureRepository.findAll(), HttpStatus.OK);
+    }
+
+    //GET ALL THE ORDERS USING PAGES
+    public ResponseEntity<?> getAllOrdersByPages(Pageable paging){
+        return new ResponseEntity<>(furnitureRepository.findAll(paging), HttpStatus.OK);
     }
 
     //GET ALL ORDERS FOR VENDOR
@@ -59,7 +69,7 @@ public class FurnitureService {
     }
 
     //UPDATE ORDER BY ADMIN
-    public ResponseEntity<?> updateOrder(Long id, Order orderDetails) {
+    public ResponseEntity<?> updateOrderByAdmin(Long id, Order orderDetails) {
         Order order = furnitureRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not exist with id :" + id));
         order.setIsRejectedByAdmin(orderDetails.getIsRejectedByAdmin());
@@ -77,7 +87,7 @@ public class FurnitureService {
         return updatedOrder;
     }
 
-    //DELETE ORDER
+    //DELETE ORDER BY ADMIN
     public ResponseEntity<?> deleteOrder(Long orderId) {
         Order order = furnitureRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order cannot be deleted"));

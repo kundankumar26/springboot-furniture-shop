@@ -100,8 +100,8 @@ public class AuthController {
                 signUpRequest.getEmpUsername(), signUpRequest.getEmail(),
                 passwordEncoder.encode(signUpRequest.getEmpPassword()));
 
-        String currentUserRole = signUpRequest.getRole();
-        Set<String> strRoles = Collections.singleton(currentUserRole==null ? "false" : currentUserRole);
+        String currentUserRole = signUpRequest.getRole().toLowerCase(Locale.ROOT);
+        Set<String> strRoles = Collections.singleton(currentUserRole == null ? "false" : currentUserRole);
         Set<Role> roles = new HashSet<>();
 
         strRoles.forEach(role -> {
