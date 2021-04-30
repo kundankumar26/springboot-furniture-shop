@@ -47,8 +47,9 @@ public class VendorController {
             ordersStringBuilder.append("<td>").append(updatedOrder.getQty()).append("</td>").append("<td>").append(updatedOrder.getShippingAddress()).append("</td>");
             ordersStringBuilder.append("<td>").append(updatedOrder.getPhnNo()).append("</td>").append("<td>").append(updatedOrder.getShippedDate().substring(0, 11)).append("</td></tr>");
 
-            javaMailSender.send(GlobalClassForFunctions.sendEmailForOrder(javaMailSender.createMimeMessage(), "alternate8991@gmail.com", "Order confirmed successfully.",
-                    "confirmed", ordersStringBuilder, "user.getEmpFirstName() + " + " + user.getEmpLastName()"));
+            javaMailSender.send(GlobalClassForFunctions.sendEmailForOrder(javaMailSender.createMimeMessage(), updatedOrder.getEmail(),
+                    "Order confirmed successfully.", "confirmed", ordersStringBuilder,
+                    "none"));
         } catch (Exception e) {
             return new ResponseEntity<>(new MessageResponse("Order cannot be updated"), HttpStatus.BAD_REQUEST);
         }

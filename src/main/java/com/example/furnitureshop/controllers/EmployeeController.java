@@ -64,10 +64,24 @@ public class EmployeeController {
         if(user == null){
             return new ResponseEntity<>(new MessageResponse("Order cannot be created for employee with id: " + currentEmployeeId), HttpStatus.BAD_REQUEST);
         }
+        StringBuilder stringBuilderForAddAndPhone = new StringBuilder();
+        if(orderDetails.get(0).getShippingAddress().length() < 5){
+            stringBuilderForAddAndPhone.append("Shipping address is too short. ");
+        }
+        if(String.valueOf(orderDetails.get(0).getPhnNo()).length() < 10){
+            stringBuilderForAddAndPhone.append("Phone number is too short. ");
+        }
+        if(String.valueOf(orderDetails.get(0).getPhnNo()).length() > 10 ){
+            stringBuilderForAddAndPhone.append("Phone number is too long. ");
+        }
+        if(orderDetails.get(0).getShippingAddress().length() < 5 || String.valueOf(orderDetails.get(0).getPhnNo()).length() != 10){
+            return new ResponseEntity<>(new MessageResponse(stringBuilderForAddAndPhone.toString()), HttpStatus.NOT_ACCEPTABLE);
+        }
         int orderPlaced = 0, orderNotPlaced = 0;
         List<Order> createdOrders = new ArrayList<>();
         StringBuilder ordersStringBuilder = new StringBuilder();
         for(Order order: orderDetails){
+
             System.out.println(order.getItemRequested());
             boolean ifItemExist = furnitureService.findIfItemExistForCurrentEmp(currentEmployeeId, order.getItemRequested());
             if(ifItemExist){
@@ -98,8 +112,9 @@ public class EmployeeController {
 //                    ordersStringBuilder, user.getEmpFirstName() + " " + user.getEmpLastName());
 //            javaMailSender.send(mimeMessage);
             if(orderPlaced > 0){
-                javaMailSender.send(GlobalClassForFunctions.sendEmailForOrder(javaMailSender.createMimeMessage(), "alternate8989@gmail.com",
-                        "Order placed successfully.", "placed", ordersStringBuilder, user.getEmpFirstName() + " " + user.getEmpLastName()));
+                javaMailSender.send(GlobalClassForFunctions.sendEmailForOrder(javaMailSender.createMimeMessage(), user.getEmail(),
+                        "Order placed successfully.", "placed", ordersStringBuilder,
+                        user.getEmpFirstName() + " " + user.getEmpLastName()));
             }
         } catch(Exception e){
             e.printStackTrace();

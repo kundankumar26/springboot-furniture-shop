@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 
@@ -87,6 +88,9 @@ public class FurnitureService {
         Order order = furnitureRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not exist with id :" + orderId));
         if(orderDetails.getShippedDate().length() > 0) {
+            System.out.println(order.getOrderDate()+" "+ orderDetails.getShippedDate() + " " +
+                    order.getOrderDate().compareTo(GlobalClassForFunctions.getCurrentDateAndTime(orderDetails.getShippedDate())));
+            //System.out.println(new Date(new Date(System.currentTimeMillis()).getDate() - new Date(orderDetails.getShippedDate()));
             order.setShippedDate(GlobalClassForFunctions.getCurrentDateAndTime(orderDetails.getShippedDate()));
             return furnitureRepository.save(order);
         }

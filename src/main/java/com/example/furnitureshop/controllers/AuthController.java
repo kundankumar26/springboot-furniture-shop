@@ -5,11 +5,9 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import com.example.furnitureshop.GlobalClassForFunctions;
 import com.example.furnitureshop.exceptions.ResourceNotFoundException;
-import com.example.furnitureshop.models.ConfirmationToken;
-import com.example.furnitureshop.models.ERole;
-import com.example.furnitureshop.models.Role;
-import com.example.furnitureshop.models.User;
+import com.example.furnitureshop.models.*;
 import com.example.furnitureshop.payload.request.LoginRequest;
 import com.example.furnitureshop.payload.request.SignupRequest;
 import com.example.furnitureshop.payload.response.JwtResponse;
@@ -91,30 +89,50 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
         if (userRepository.existsByUsername(signUpRequest.getEmpUsername())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse("Error: Username is already taken!"));
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
         }
 
         if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse("Error: Email is already in use!"));
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already in use!"));
         }
 
         if(userRepository.existsByEmpId(signUpRequest.getEmpId())){
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse("Error: Employee Id is already in use!"));
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: Employee Id is already in use!"));
         }
 
         // Create new user's account
         User user = null;
         try {
+            System.out.println(signUpRequest.getEmpPassword());
+            //Checks the Password strength
+            StringBuilder stringBuilderForLength = new StringBuilder();
+            if(signUpRequest.getEmpPassword().length() < 6){
+                stringBuilderForLength.append("Password is too short. ");
+            }
+            if(signUpRequest.getEmpUsername().length() < 6){
+                stringBuilderForLength.append("username is too short. ");
+                return new ResponseEntity<>(new MessageResponse(stringBuilderForLength.toString()), HttpStatus.NOT_ACCEPTABLE);
+            }
+
+            //Check if First, Last and Username is valid
+            StringBuilder stringBuilderForNames = GlobalClassForFunctions.CheckUserRequestForAlphabets(signUpRequest.getEmpFirstName(),
+                    signUpRequest.getEmpLastName(), signUpRequest.getEmpUsername());
+            if(stringBuilderForNames.length() > 1){
+                return new ResponseEntity<>(new MessageResponse(stringBuilderForNames.toString()), HttpStatus.NOT_ACCEPTABLE);
+            }
+
+            StringBuilder stringBuilder = GlobalClassForFunctions.checkPasswordStrength(signUpRequest.getEmpPassword(), signUpRequest.getEmpFirstName());
+            if(stringBuilder.length() > 2){
+                return new ResponseEntity<>(new MessageResponse(stringBuilder.toString()), HttpStatus.NOT_ACCEPTABLE);
+            }
+            System.out.println(signUpRequest.getEmpPassword());
+
+
+
             user = new User(signUpRequest.getEmpId(),
                     signUpRequest.getEmpFirstName().substring(0, 1).toUpperCase() + signUpRequest.getEmpFirstName().substring(1).toLowerCase(),
                     signUpRequest.getEmpLastName().substring(0, 1).toUpperCase() + signUpRequest.getEmpLastName().substring(1).toLowerCase(),
-                    signUpRequest.getEmpUsername().toLowerCase(Locale.ENGLISH), signUpRequest.getEmail(),
+                    signUpRequest.getEmpUsername(), signUpRequest.getEmail(),
                     passwordEncoder.encode(signUpRequest.getEmpPassword()));
             user.setIsEnabled(false);
         } catch(Exception e){
