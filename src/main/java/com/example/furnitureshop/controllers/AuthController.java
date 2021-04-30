@@ -64,10 +64,14 @@ public class AuthController {
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
         System.out.println(loginRequest.getUsername());
+        ConfirmationToken confirmationToken = confirmationTokenRepository.findByEmployeeUsername(loginRequest.getUsername());
+        if(confirmationToken != null){
+            System.out.println("Account not verified.");
+            return new ResponseEntity<>(new MessageResponse("Account not verified."), HttpStatus.FORBIDDEN);
+        }
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
-        System.out.println(loginRequest.getUsername());
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication);
 
@@ -105,11 +109,17 @@ public class AuthController {
         }
 
         // Create new user's account
-        User user = new User(signUpRequest.getEmpId(),
-                signUpRequest.getEmpFirstName().substring(0, 1).toUpperCase() + signUpRequest.getEmpFirstName().substring(1).toLowerCase(),
-                signUpRequest.getEmpLastName().substring(0, 1).toUpperCase() + signUpRequest.getEmpLastName().substring(1).toLowerCase(),
-                signUpRequest.getEmpUsername(), signUpRequest.getEmail(),
-                passwordEncoder.encode(signUpRequest.getEmpPassword()));
+        User user = null;
+        try {
+            user = new User(signUpRequest.getEmpId(),
+                    signUpRequest.getEmpFirstName().substring(0, 1).toUpperCase() + signUpRequest.getEmpFirstName().substring(1).toLowerCase(),
+                    signUpRequest.getEmpLastName().substring(0, 1).toUpperCase() + signUpRequest.getEmpLastName().substring(1).toLowerCase(),
+                    signUpRequest.getEmpUsername().toLowerCase(Locale.ENGLISH), signUpRequest.getEmail(),
+                    passwordEncoder.encode(signUpRequest.getEmpPassword()));
+            user.setIsEnabled(false);
+        } catch(Exception e){
+            return new ResponseEntity<>(new MessageResponse("Error in registering user."), HttpStatus.NOT_ACCEPTABLE);
+        }
 
         String currentUserRole = signUpRequest.getRole().toLowerCase(Locale.ROOT);
         Set<String> strRoles = Collections.singleton(currentUserRole == null ? "false" : currentUserRole);
@@ -133,19 +143,18 @@ public class AuthController {
         userRepository.save(user);
 
         ConfirmationToken confirmationToken = new ConfirmationToken(user);
-
         confirmationTokenRepository.save(confirmationToken);
 
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(user.getEmail());
-        mailMessage.setSubject("Complete Registration!");
-        mailMessage.setFrom("chand312902@gmail.com");
+        mailMessage.setSubject("Complete your Registration!");
+        mailMessage.setFrom("alternate8991@gmail.com");
         mailMessage.setText("To confirm your account, please click here : "
-                +"http://localhost:8080/confirm-account?token="+confirmationToken.getConfirmationToken());
+                + "http://localhost:8080/confirm-account?token=" + confirmationToken.getConfirmationToken());
 
         emailSenderService.sendEmail(mailMessage);
 
-        System.out.println(user);
+        System.out.println("new user created" + user);
         return new ResponseEntity<>(new MessageResponse("User registered successfully!"), HttpStatus.CREATED);
     }
 
@@ -156,23 +165,21 @@ public class AuthController {
         try{
             long milliSeconds = new Date(new Date(System.currentTimeMillis()).getTime() - token.getCreatedDate().getTime()).getTime();
             long diffInMinutes = TimeUnit.MINUTES.convert(milliSeconds, TimeUnit.MILLISECONDS);
-            System.out.println(milliSeconds + " " + diffInMinutes);
 
             //System.out.println(new SimpleDateFormat("HH:mm:ss").format(token.getCreatedDate()));
             //System.out.println(new SimpleDateFormat("HH:mm:ss").format(new Date(System.currentTimeMillis())));
 
             if(diffInMinutes <= 10) {
-                User user = userRepository.findByEmpId(token.getUser().getEmpId());
+                User user = token.getUser();
                 System.out.println("confirmed account " + user.getEmail());
-                //user.setEnabled(true);
-                //userRepository.save(user);
+                user.setIsEnabled(true);
+                userRepository.save(user);
                 confirmationTokenRepository.delete(token);
             }
             else{
                 throw new RuntimeException();
             }
         } catch(Exception e){
-            //e.printStackTrace();
             return new ResponseEntity<>(new MessageResponse("The link is invalid or broken!"), HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(new MessageResponse("Account verified."), HttpStatus.OK);

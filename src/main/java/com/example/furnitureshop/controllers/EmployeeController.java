@@ -6,6 +6,7 @@ import com.example.furnitureshop.models.User;
 import com.example.furnitureshop.payload.response.MessageResponse;
 import com.example.furnitureshop.security.services.FurnitureService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -62,16 +64,31 @@ public class EmployeeController {
         if(user == null){
             return new ResponseEntity<>(new MessageResponse("Order cannot be created for employee with id: " + currentEmployeeId), HttpStatus.BAD_REQUEST);
         }
+        int orderPlaced = 0, orderNotPlaced = 0;
+        List<Order> createdOrders = new ArrayList<>();
         StringBuilder ordersStringBuilder = new StringBuilder();
         for(Order order: orderDetails){
+            System.out.println(order.getItemRequested());
+            boolean ifItemExist = furnitureService.findIfItemExistForCurrentEmp(currentEmployeeId, order.getItemRequested());
+            if(ifItemExist){
+                orderNotPlaced++;
+                continue;
+            }
             order.setEmpId(currentEmployeeId);
             order.setEmpName(user.getEmpFirstName() + " " + user.getEmpLastName());
             order.setEmail(user.getEmail());
             order.setIsRejectedByAdmin(0);
             order.setOrderDate(GlobalClassForFunctions.getCurrentDateAndTime(new SimpleDateFormat("dd-MM-yyyy").format(Calendar.getInstance().getTime())));
-            ordersStringBuilder.append("<tr style=\"text-align: center\"><td>").append(order.getOrderId()).append("</td>").append("<td>").append(order.getItemRequested()).append("</td>");
-            ordersStringBuilder.append("<td>").append(order.getQty()).append("</td>").append("<td>").append(order.getShippingAddress()).append("</td>");
-            ordersStringBuilder.append("<td>").append(order.getPhnNo()).append("</td>").append("<td>").append(order.getOrderDate().substring(0, 11)).append("</td></tr>");
+            try {
+                createdOrders.add(furnitureService.createOrder(order));
+                orderPlaced++;
+                ordersStringBuilder.append("<tr style=\"text-align: center\"><td>").append(order.getOrderId()).append("</td>").append("<td>").append(order.getItemRequested()).append("</td>");
+                ordersStringBuilder.append("<td>").append(order.getQty()).append("</td>").append("<td>").append(order.getShippingAddress()).append("</td>");
+                ordersStringBuilder.append("<td>").append(order.getPhnNo()).append("</td>").append("<td>").append(order.getOrderDate().substring(0, 11)).append("</td></tr>");
+
+            } catch(Exception e){
+                e.printStackTrace();
+            }
         }
 
         try{
@@ -80,18 +97,17 @@ public class EmployeeController {
 //            GlobalClassForFunctions.sendEmailForOrderAlternate(helper, "alternate8989@gmail.com", "Order placed successfully.",
 //                    ordersStringBuilder, user.getEmpFirstName() + " " + user.getEmpLastName());
 //            javaMailSender.send(mimeMessage);
-            javaMailSender.send(GlobalClassForFunctions.sendEmailForOrder(javaMailSender.createMimeMessage(), "alternate8989@gmail.com", "Order placed successfully.",
-                    "placed", ordersStringBuilder, user.getEmpFirstName() + " " + user.getEmpLastName()));
+            if(orderPlaced > 0){
+                javaMailSender.send(GlobalClassForFunctions.sendEmailForOrder(javaMailSender.createMimeMessage(), "alternate8989@gmail.com",
+                        "Order placed successfully.", "placed", ordersStringBuilder, user.getEmpFirstName() + " " + user.getEmpLastName()));
+            }
         } catch(Exception e){
             e.printStackTrace();
         }
-        ResponseEntity<?> createdOrders;
-        try{
-            createdOrders = furnitureService.createOrder(orderDetails);
-        } catch(Exception e) {
-            return new ResponseEntity<>(new MessageResponse("Order cannot be created"), HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(createdOrders, HttpStatus.CREATED);
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.add("Success", String.valueOf(orderPlaced));
+        responseHeaders.add("Failed", String.valueOf(orderNotPlaced));
+        return new ResponseEntity<>(createdOrders, responseHeaders, HttpStatus.CREATED);
     }
 
     @DeleteMapping(value = "/{orderId}")

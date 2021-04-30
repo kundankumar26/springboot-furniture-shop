@@ -38,7 +38,7 @@ public class AdminController {
     public ResponseEntity<?> getOrders(@PathVariable int pageNumber, @PathVariable String sortBy) {
         ResponseEntity<?> responseEntity;
         try{
-            Pageable pageable = PageRequest.of(pageNumber, 30, Sort.by(sortBy));
+            Pageable pageable = PageRequest.of(pageNumber, 5, Sort.by(sortBy));
             responseEntity = furnitureService.getAllOrdersByPages(pageable);
         } catch(Exception e){
             return new ResponseEntity<>(new ResourceNotFoundException("Cannot get the orders"), HttpStatus.NOT_FOUND);

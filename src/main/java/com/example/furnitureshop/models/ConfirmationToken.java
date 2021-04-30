@@ -19,20 +19,25 @@ public class ConfirmationToken {
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdDate;
 
+    @Column(name="username_token")
+    private String username;
+
     @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER)
     @JoinColumn(nullable = false, name = "user_id")
     private User user;
 
-    public ConfirmationToken(long tokenid, String confirmationToken, Date createdDate, User user) {
+    public ConfirmationToken(long tokenid, String confirmationToken, Date createdDate, String username, User user) {
         this.tokenid = tokenid;
         this.confirmationToken = confirmationToken;
         this.createdDate = createdDate;
+        this.username = username;
         this.user = user;
     }
 
     public ConfirmationToken(User user) {
         this.user = user;
         createdDate = new Date();
+        username = user.getEmpUsername();
         confirmationToken = UUID.randomUUID().toString();
     }
 
@@ -62,6 +67,14 @@ public class ConfirmationToken {
 
     public void setCreatedDate(Date createdDate) {
         this.createdDate = createdDate;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public User getUser() {

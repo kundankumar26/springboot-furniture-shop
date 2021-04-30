@@ -7,4 +7,7 @@ import org.springframework.data.repository.CrudRepository;
 public interface ConfirmationTokenRepository extends CrudRepository<ConfirmationToken, String> {
     @Query(value = "SELECT * FROM confirmation_token_table c WHERE c.confirmation_token LIKE :confirmationToken", nativeQuery = true)
     ConfirmationToken findByConfirmationToken(String confirmationToken);
+
+    @Query(value = "SELECT * FROM confirmation_token_table c WHERE c.username_token LIKE :username", nativeQuery = true)
+    ConfirmationToken findByEmployeeUsername(String username);
 }

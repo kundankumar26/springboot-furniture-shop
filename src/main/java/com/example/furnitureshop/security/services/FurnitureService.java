@@ -60,7 +60,11 @@ public class FurnitureService {
     }
 
     //CREATE AN ORDER
-    public ResponseEntity<?> createOrder(List<Order> orderDetails) {
+    public Order createOrder(Order orderDetails) {
+        return furnitureRepository.save(orderDetails);
+    }
+
+    public ResponseEntity<?> createOrders(List<Order> orderDetails) {
         List<Order> createdOrders = new ArrayList<>();
         for(Order order: orderDetails){
             createdOrders.add(furnitureRepository.save(order));
@@ -82,9 +86,11 @@ public class FurnitureService {
     public Order updateOrderByVendor(long orderId, Order orderDetails){
         Order order = furnitureRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not exist with id :" + orderId));
-        order.setShippedDate(GlobalClassForFunctions.getCurrentDateAndTime(orderDetails.getShippedDate()));
-        Order updatedOrder = furnitureRepository.save(order);
-        return updatedOrder;
+        if(orderDetails.getShippedDate().length() > 0) {
+            order.setShippedDate(GlobalClassForFunctions.getCurrentDateAndTime(orderDetails.getShippedDate()));
+            return furnitureRepository.save(order);
+        }
+        return null;
     }
 
     //DELETE ORDER BY ADMIN
@@ -103,5 +109,20 @@ public class FurnitureService {
     //RETURN USER OBJECT FROM EMPLOYEE ID
     public ResponseEntity<?> findByEmpId(long empId) {
         return new ResponseEntity<>(userRepository.findByEmpId(empId), HttpStatus.OK);
+    }
+
+    public boolean findIfItemExistForCurrentEmp(long empId, String itemRequested) {
+        ResponseEntity<?> responseEntity = null;
+        try{
+            List<Order> getOrders = null;
+            getOrders = furnitureRepository.findIfItemExistForCurrentEmp(empId, itemRequested);
+            //System.out.println(responseEntity.getBody());
+            if(getOrders.size() > 0){
+                return true;
+            }
+        } catch(Exception e){
+            return false;
+        }
+        return false;
     }
 }

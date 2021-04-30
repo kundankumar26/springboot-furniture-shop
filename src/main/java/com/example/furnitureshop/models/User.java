@@ -46,8 +46,11 @@ public class User {
     @Size(max = 120)
     private String empPassword;
 
+    @NotNull
+    private boolean isEnabled;
+
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(	name = "user_roles",
+    @JoinTable(name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
@@ -120,6 +123,14 @@ public class User {
 
     public void setEmpPassword(String empPassword) {
         this.empPassword = empPassword;
+    }
+
+    public boolean getIsEnabled() {
+        return isEnabled;
+    }
+
+    public void setIsEnabled(boolean enabled) {
+        this.isEnabled = enabled;
     }
 
     public Set<Role> getRoles() {

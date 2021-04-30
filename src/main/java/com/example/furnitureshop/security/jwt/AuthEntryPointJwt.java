@@ -22,7 +22,7 @@ public class AuthEntryPointJwt implements AuthenticationEntryPoint {
                          AuthenticationException authException) throws IOException, ServletException {
         logger.error("Unauthorized error: {}", authException.getMessage());
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Error: Unauthorized");
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Incorrect login credentials i.e. email or password!");
     }
 
 }

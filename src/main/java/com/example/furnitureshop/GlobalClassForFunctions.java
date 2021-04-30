@@ -31,7 +31,7 @@ public class GlobalClassForFunctions {
         String message = (OrderType.equals("placed") ? "<h4>Hi " + employeeName + ",</h4>\n" +
                 "<p>Hope you are doing great. Thanks for shopping with us. <br> You ordered these products.</p>\n" +
                 "\n" : "<p>Hope you are doing great. Your order was confirmed by the vendor. <p>") +
-                "<table style=\"width:100%; border: 2px solid black\">\n" +
+                "<table style=\"width:100%; border: 2px solid black; color: rgba(0, 0, 0, 0.7);\">\n" +
                 "\t<thead>\n" +
                 "        <tr>\n" +
                 "          <th style=\"border-bottom: 1px solid black;\">Order Id</th>\n" +
@@ -52,6 +52,23 @@ public class GlobalClassForFunctions {
         helper.setSubject(subject);
         helper.setFrom("alternate8991@gmail.com");
         return mimeMessage;
+    }
+
+    public static boolean checkPasswordStrength(String password){
+        boolean isThereUppercase = false, isThereLowercase = false, isThereNumber = false, isThereSpecialChar = false;
+        for(int i = 0; i < password.length(); i++){
+            if(password.charAt(i) >= 'A' && password.charAt(i) <= 'Z'){
+                isThereUppercase = true;
+            } else if(password.charAt(i) >= 'a' && password.charAt(i) <= 'z'){
+                isThereLowercase = true;
+            }
+            else if(password.charAt(i) >= '!' || password.charAt(i) <= '.'){
+                isThereSpecialChar = true;
+            } else if(password.charAt(i) >= '0' && password.charAt(i) <= '9'){
+                isThereNumber = true;
+            }
+        }
+        return isThereUppercase && isThereLowercase && isThereNumber && isThereSpecialChar;
     }
 
 }
