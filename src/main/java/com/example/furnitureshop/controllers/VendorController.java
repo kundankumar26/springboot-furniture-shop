@@ -4,6 +4,7 @@ import com.example.furnitureshop.GlobalClassForFunctions;
 import com.example.furnitureshop.exceptions.ResourceNotFoundException;
 import com.example.furnitureshop.models.Order;
 import com.example.furnitureshop.payload.response.MessageResponse;
+import com.example.furnitureshop.security.services.EmailSenderService;
 import com.example.furnitureshop.security.services.FurnitureService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,9 @@ public class VendorController {
 
     @Autowired
     private JavaMailSender javaMailSender;
+
+    @Autowired
+    private EmailSenderService emailSenderService;
 
     @GetMapping(value = "/")
     public ResponseEntity<?> getOrders() {
@@ -47,9 +51,11 @@ public class VendorController {
             ordersStringBuilder.append("<td>").append(updatedOrder.getQty()).append("</td>").append("<td>").append(updatedOrder.getShippingAddress()).append("</td>");
             ordersStringBuilder.append("<td>").append(updatedOrder.getPhnNo()).append("</td>").append("<td>").append(updatedOrder.getShippedDate().substring(0, 11)).append("</td></tr>");
 
-            javaMailSender.send(GlobalClassForFunctions.sendEmailForOrder(javaMailSender.createMimeMessage(), updatedOrder.getEmail(),
-                    "Order confirmed successfully.", "confirmed", ordersStringBuilder,
-                    "none"));
+//            javaMailSender.send(GlobalClassForFunctions.sendEmailForOrder(javaMailSender.createMimeMessage(), updatedOrder.getEmail(),
+//                    "Order confirmed successfully.", "confirmed", ordersStringBuilder,
+//                    "none"));
+
+            emailSenderService.sendConfirmedOrderEmail(updatedOrder);
         } catch (Exception e) {
             return new ResponseEntity<>(new MessageResponse("Order cannot be updated"), HttpStatus.BAD_REQUEST);
         }

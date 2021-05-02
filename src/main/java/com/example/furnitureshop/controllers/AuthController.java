@@ -22,6 +22,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -30,6 +32,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 import javax.validation.Valid;
 
 
@@ -51,6 +55,9 @@ public class AuthController {
 
     @Autowired
     private EmailSenderService emailSenderService;
+
+    @Autowired
+    private JavaMailSender javaMailSender;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -80,6 +87,7 @@ public class AuthController {
 
         for(String role: roles){
             System.out.println(role + " " + jwt);
+            System.out.println(UUID.randomUUID().toString());
         }
 
         return ResponseEntity.ok(new JwtResponse(jwt, userDetails.getId(), userDetails.getUsername(),
@@ -87,7 +95,7 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
+    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) throws MessagingException {
         if (userRepository.existsByUsername(signUpRequest.getEmpUsername())) {
             return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
         }
@@ -163,14 +171,17 @@ public class AuthController {
         ConfirmationToken confirmationToken = new ConfirmationToken(user);
         confirmationTokenRepository.save(confirmationToken);
 
-        SimpleMailMessage mailMessage = new SimpleMailMessage();
-        mailMessage.setTo(user.getEmail());
-        mailMessage.setSubject("Complete your Registration!");
-        mailMessage.setFrom("alternate8991@gmail.com");
-        mailMessage.setText("To confirm your account, please click here : "
-                + "http://localhost:8080/confirm-account?token=" + confirmationToken.getConfirmationToken());
+        emailSenderService.sendConfirmationEmail(user.getEmail(), confirmationToken.getConfirmationToken());
 
-        emailSenderService.sendEmail(mailMessage);
+
+//        SimpleMailMessage mailMessage = new SimpleMailMessage();
+//        mailMessage.setTo(user.getEmail());
+//        mailMessage.setSubject("Complete your Registration!");
+//        mailMessage.setFrom("alternate8991@gmail.com");
+//        mailMessage.setText("To confirm your account, please click here : "
+//                + "http://localhost:8080/confirm-account?token=" + confirmationToken.getConfirmationToken());
+//
+//        emailSenderService.sendEmail(mailMessage);
 
         System.out.println("new user created" + user);
         return new ResponseEntity<>(new MessageResponse("User registered successfully!"), HttpStatus.CREATED);
@@ -191,7 +202,7 @@ public class AuthController {
                 User user = token.getUser();
                 System.out.println("confirmed account " + user.getEmail());
                 user.setIsEnabled(true);
-                userRepository.save(user);
+                //userRepository.save(user);
                 confirmationTokenRepository.delete(token);
             }
             else{

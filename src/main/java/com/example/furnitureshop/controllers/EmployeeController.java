@@ -4,6 +4,7 @@ import com.example.furnitureshop.GlobalClassForFunctions;
 import com.example.furnitureshop.models.Order;
 import com.example.furnitureshop.models.User;
 import com.example.furnitureshop.payload.response.MessageResponse;
+import com.example.furnitureshop.security.services.EmailSenderService;
 import com.example.furnitureshop.security.services.FurnitureService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -30,6 +31,9 @@ public class EmployeeController {
 
     @Autowired
     private JavaMailSender javaMailSender;
+
+    @Autowired
+    private EmailSenderService emailSenderService;
 
     @GetMapping(value = "/")
     public Object getOrders() {
@@ -82,8 +86,8 @@ public class EmployeeController {
         StringBuilder ordersStringBuilder = new StringBuilder();
         for(Order order: orderDetails){
 
-            System.out.println(order.getItemRequested());
-            boolean ifItemExist = furnitureService.findIfItemExistForCurrentEmp(currentEmployeeId, order.getItemRequested());
+            System.out.println(order.getItemRequested() + " " + GlobalClassForFunctions.checkIfItemOrdered(order.getItemRequested()));
+            boolean ifItemExist = furnitureService.findIfItemExistForCurrentEmp(currentEmployeeId, GlobalClassForFunctions.checkIfItemOrdered(order.getItemRequested()));
             if(ifItemExist){
                 orderNotPlaced++;
                 continue;
@@ -112,9 +116,7 @@ public class EmployeeController {
 //                    ordersStringBuilder, user.getEmpFirstName() + " " + user.getEmpLastName());
 //            javaMailSender.send(mimeMessage);
             if(orderPlaced > 0){
-                javaMailSender.send(GlobalClassForFunctions.sendEmailForOrder(javaMailSender.createMimeMessage(), user.getEmail(),
-                        "Order placed successfully.", "placed", ordersStringBuilder,
-                        user.getEmpFirstName() + " " + user.getEmpLastName()));
+                emailSenderService.sendOrderPlacedEmail(createdOrders);
             }
         } catch(Exception e){
             e.printStackTrace();
