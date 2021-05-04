@@ -1,6 +1,5 @@
 package com.example.furnitureshop.controllers;
 
-import com.example.furnitureshop.GlobalClassForFunctions;
 import com.example.furnitureshop.exceptions.ResourceNotFoundException;
 import com.example.furnitureshop.models.Order;
 import com.example.furnitureshop.payload.response.MessageResponse;
