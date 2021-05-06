@@ -3,6 +3,7 @@ package com.example.furnitureshop.controllers;
 import com.example.furnitureshop.exceptions.ResourceNotFoundException;
 import com.example.furnitureshop.models.Order;
 import com.example.furnitureshop.payload.response.MessageResponse;
+import com.example.furnitureshop.security.services.AdminService;
 import com.example.furnitureshop.security.services.FurnitureService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -12,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
 
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -23,13 +26,27 @@ public class AdminController {
     @Autowired
     private FurnitureService furnitureService;
 
+    @Autowired
+    private AdminService adminService;
+
     @GetMapping(value = "/")
     public ResponseEntity<?> getOrders() {
         ResponseEntity<?> responseEntity;
-        try{
-            responseEntity = furnitureService.getAllOrders();
+        try {
+            responseEntity = adminService.getUncheckedOrders();
         } catch(Exception e){
-            return new ResponseEntity<>(new ResourceNotFoundException("Cannot get the orders"), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new MessageResponse("Cannot get the orders"), HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(responseEntity, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/view-all")
+    public ResponseEntity<?> getPreviousOrders() {
+        ResponseEntity<?> responseEntity;
+        try {
+            responseEntity = adminService.getOldOrders();
+        } catch(Exception e) {
+            return new ResponseEntity<>(new MessageResponse("Cannot get the orders"), HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(responseEntity, HttpStatus.OK);
     }

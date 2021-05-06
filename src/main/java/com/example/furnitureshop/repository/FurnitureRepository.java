@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -21,4 +22,10 @@ public interface FurnitureRepository extends JpaRepository<Order, Long> {
 
     @Query(value = "SELECT * FROM orders WHERE emp_id=:empId and item_requested LIKE %:itemRequested%", nativeQuery = true)
     List<Order> findIfItemExistForCurrentEmp(@Param(value = "empId") long empId, @Param(value = "itemRequested") String itemRequested);
+
+    @Query(value = "SELECT * FROM orders WHERE is_rejected_by_admin!=0", nativeQuery = true)
+    List<Order> findOldOrders();
+
+    @Query(value = "SELECT * FROM orders WHERE is_rejected_by_admin=0", nativeQuery = true)
+    ArrayList<Order> findUncheckedOrders();
 }

@@ -4,6 +4,7 @@ import com.example.furnitureshop.models.FirstLastUsernameValid;
 import com.example.furnitureshop.models.Order;
 import com.example.furnitureshop.models.PasswordStrength;
 import com.example.furnitureshop.payload.response.MessageResponse;
+import com.example.furnitureshop.security.services.UserDetailsImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -33,6 +34,8 @@ public class GlobalClassForFunctions {
 
     //Get the username from securitycontextholder
     public static String getUserNameFromToken(){
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        System.out.println("this is current user id " + userDetails.getId());
         return SecurityContextHolder.getContext().getAuthentication().getName();
     }
 
