@@ -3,9 +3,11 @@ package com.example.furnitureshop.controllers;
 import com.example.furnitureshop.exceptions.ResourceNotFoundException;
 import com.example.furnitureshop.models.Order;
 import com.example.furnitureshop.models.Orders;
+import com.example.furnitureshop.models.Product;
 import com.example.furnitureshop.payload.response.MessageResponse;
 import com.example.furnitureshop.security.services.AdminService;
 import com.example.furnitureshop.security.services.FurnitureService;
+import com.example.furnitureshop.security.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +31,9 @@ public class AdminController {
 
     @Autowired
     private AdminService adminService;
+
+    @Autowired
+    private ProductService productService;
 
     //Get unchecked orders
     @GetMapping(value = "/")
@@ -71,7 +76,16 @@ public class AdminController {
     public ResponseEntity<?> updateOrder(@PathVariable Long orderId, @RequestBody Orders orderDetails){
         ResponseEntity<?> responseEntity;
         try{
+            if(orderDetails.getIsRejectedByAdmin() == 1) {
+                Product product = productService.findByProductId(orderDetails.getProductId());
+                if (product.getProductQty() < orderDetails.getQty()) {
+                    return new ResponseEntity<>(new MessageResponse("Product qty cannot be satisfied."), HttpStatus.NOT_FOUND);
+                }
+                product.setProductQty(product.getProductQty() - orderDetails.getQty());
+                productService.updateProduct(product);
+            }
             responseEntity = adminService.updateOrderByAdmin(orderId, orderDetails);
+
         } catch(Exception e){
             return new ResponseEntity<>(new MessageResponse("Order cannot be updated"), HttpStatus.BAD_REQUEST);
         }

@@ -61,8 +61,8 @@ public class FurnitureService {
     }
 
     //CREATE AN ORDER
-    public Order createOrder(Order orderDetails) {
-        return furnitureRepository.save(orderDetails);
+    public ResponseEntity<?> createOrder(Order orderDetails) {
+        return new ResponseEntity<>(furnitureRepository.save(orderDetails), HttpStatus.OK);
     }
 
     public ResponseEntity<?> createOrders(List<Order> orderDetails) {

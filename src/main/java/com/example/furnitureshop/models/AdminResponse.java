@@ -17,6 +17,7 @@ public class AdminResponse {
     private String empFirstName;
     private String empLastName;
     private String email;
+    private long productId;
     private String productName;
     private int productPrice;
     private int productQty;
@@ -24,7 +25,7 @@ public class AdminResponse {
     public AdminResponse(){}
 
     public AdminResponse(long orderId, int qty, int isRejectedByAdmin, long id, long empId,
-                         String empFirstName, String empLastName, String email, String productName,
+                         String empFirstName, String empLastName, String email, long productId, String productName,
                          int productPrice, int productQty) {
         this.orderId = orderId;
         this.qty = qty;
@@ -34,6 +35,7 @@ public class AdminResponse {
         this.empFirstName = empFirstName;
         this.empLastName = empLastName;
         this.email = email;
+        this.productId = productId;
         this.productName = productName;
         this.productPrice = productPrice;
         this.productQty = productQty;
@@ -101,6 +103,14 @@ public class AdminResponse {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(long productId) {
+        this.productId = productId;
     }
 
     public String getProductName() {

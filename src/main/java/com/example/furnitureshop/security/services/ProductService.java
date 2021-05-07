@@ -1,5 +1,6 @@
 package com.example.furnitureshop.security.services;
 
+import com.example.furnitureshop.exceptions.ResourceNotFoundException;
 import com.example.furnitureshop.models.Product;
 import com.example.furnitureshop.models.User;
 import com.example.furnitureshop.repository.ProductRepository;
@@ -8,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class ProductService {
@@ -30,4 +33,18 @@ public class ProductService {
         return new ResponseEntity<>(productRepository.save(product), HttpStatus.OK);
     }
 
+    public String findProductCategoryById(long productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("not found"));
+        return product.getProductCategory();
+    }
+
+    public Product findByProductId(long productId) {
+        return productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not exist with id :" + productId));
+    }
+
+    public Product updateProduct(Product product){
+        return productRepository.save(product);
+    }
 }

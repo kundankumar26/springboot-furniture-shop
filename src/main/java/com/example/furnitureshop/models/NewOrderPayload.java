@@ -2,6 +2,7 @@ package com.example.furnitureshop.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import javassist.SerialVersionUID;
+import org.springframework.data.util.Pair;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -9,26 +10,27 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class NewOrderPayload extends SerialVersionUID implements Serializable {
+public class NewOrderPayload {
     //HashMap<productId, Qty>
-    private Map<String, String> productsIdWithQty;
+    //private List<ProductWithQtyPayload> productWithQtyPayload;
+    private List<ProductWithQtyPayload> productRequest;
     private String shippingAddress;
     private int phoneNumber;
 
     public NewOrderPayload(){}
 
-    public NewOrderPayload(Map<String, String> productsIdWithQty, String shippingAddress, int phoneNumber) {
-        this.productsIdWithQty = productsIdWithQty;
+    public NewOrderPayload(List<ProductWithQtyPayload> productRequest, String shippingAddress, int phoneNumber) {
+        this.productRequest = productRequest;
         this.shippingAddress = shippingAddress;
         this.phoneNumber = phoneNumber;
     }
 
-    public Map<String, String> getProductsIdWithQty() {
-        return productsIdWithQty;
+    public List<ProductWithQtyPayload> getProductRequest() {
+        return productRequest;
     }
 
-    public void setProductsIdWithQty(Map<String, String> productsIdWithQty) {
-        this.productsIdWithQty = productsIdWithQty;
+    public void setProductRequest(List<ProductWithQtyPayload> productRequest) {
+        this.productRequest = productRequest;
     }
 
     public String getShippingAddress() {

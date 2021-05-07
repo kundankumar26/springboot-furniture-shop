@@ -75,6 +75,24 @@ public class GlobalClassForFunctions {
         return mimeMessage;
     }
 
+    //Check for address and phone number
+    public static String checkAddressAndPhoneNo(String address, String phoneNumber){
+        StringBuilder stringBuilderForAddAndPhone = new StringBuilder();
+        if(address.length() < 5){
+            stringBuilderForAddAndPhone.append("Shipping address is too short. ");
+        }
+        if(phoneNumber.length() < 10){
+            stringBuilderForAddAndPhone.append("Phone number is too short. ");
+        }
+        if(phoneNumber.length() > 10 ){
+            stringBuilderForAddAndPhone.append("Phone number is too long. ");
+        }
+        if(address.length() < 5 || phoneNumber.length() != 10){
+            return stringBuilderForAddAndPhone.toString();
+        }
+        return "";
+    }
+
     //Checks the password strength implementation
     private static StringBuilder checkPasswordStrengthImpl(String password){
         boolean isThereUppercase = false, isThereLowercase = false, isThereNumber = false, isThereSpecialChar = false;

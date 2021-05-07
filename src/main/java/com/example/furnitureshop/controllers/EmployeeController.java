@@ -5,11 +5,14 @@ import com.example.furnitureshop.GlobalClassForFunctions;
 import com.example.furnitureshop.models.*;
 import com.example.furnitureshop.payload.response.MessageResponse;
 import com.example.furnitureshop.repository.AddressRepository;
+import com.example.furnitureshop.repository.FurnituresRepository;
 import com.example.furnitureshop.security.services.EmailSenderService;
 import com.example.furnitureshop.security.services.EmployeeService;
 import com.example.furnitureshop.security.services.FurnitureService;
+import com.example.furnitureshop.security.services.ProductService;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -35,6 +38,13 @@ public class EmployeeController {
     private AddressRepository addressRepository;
 
     @Autowired
+    private FurnituresRepository furnituresRepository;
+
+    @Autowired
+    private ProductService productService;
+
+
+    @Autowired
     private FurnitureService furnitureService;
 
     @Autowired
@@ -54,6 +64,46 @@ public class EmployeeController {
         return new ResponseEntity<>(employeeService.findOrdersByUserId(currentUserId), HttpStatus.OK);
     }
 
+    //Create multiple orders
+    @PostMapping(value = "/")
+    public ResponseEntity<?> createOrder(@RequestBody List<EmployeeRequest> newOrderPayload){
+
+        String checkAddAndPhone = GlobalClassForFunctions.checkAddressAndPhoneNo(newOrderPayload.get(0).getAddress(),
+                newOrderPayload.get(0).getPhoneNumber());
+        if(checkAddAndPhone.length() > 0){
+            return new ResponseEntity<>(new MessageResponse(checkAddAndPhone), HttpStatus.NOT_FOUND);
+        }
+
+        ResponseEntity<?> responseEntity = null;
+        try{
+            long currentUserId = GlobalClassForFunctions.getUserIdFromToken();
+            Address address = addressRepository.save(new Address(currentUserId, newOrderPayload.get(0).getAddress(),
+                    newOrderPayload.get(0).getPhoneNumber()));
+
+            List<Orders> ordersList = new ArrayList<>();
+            for(EmployeeRequest employeeRequest: newOrderPayload){
+                String productCategory = productService.findProductCategoryById(employeeRequest.getProductId());
+                if(employeeService.findIsProductOrdered(currentUserId, productCategory)){
+                    continue;
+                }
+                Orders orders = new Orders(currentUserId, employeeRequest.getProductId(), productCategory, address.getAddressId(),
+                        employeeRequest.getQty(), new Date(), 0);
+                ordersList.add(employeeService.createOrders(orders));
+            }
+            if(ordersList.size() > 0) {
+                responseEntity = new ResponseEntity<>(ordersList, HttpStatus.CREATED);
+            } else {
+                return new ResponseEntity<>(new MessageResponse("Product already ordered."), HttpStatus.BAD_REQUEST);
+            }
+//            if(ordersList.size() > 0){
+//                emailSenderService.sendOrderPlacedEmail(ordersList);
+//            }
+        } catch (Exception e){
+            return new ResponseEntity<>(new MessageResponse("Order cannot be created."), HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(responseEntity, HttpStatus.CREATED);
+    }
+
 //    @GetMapping(value = "/{empId}")
 //    public ResponseEntity<?> getOrderByEmpId(@PathVariable String empId){
 //        long empIdFromPath, currentUserId;
@@ -70,25 +120,7 @@ public class EmployeeController {
 //        return new ResponseEntity<>(employeeService.findOrdersByEmpId(currentUserId), HttpStatus.OK);
 //    }
 
-    @PostMapping(value = "/")
-    public ResponseEntity<?> createOrder(@RequestBody Object newOrderPayload){
-        long currentUserId = GlobalClassForFunctions.getUserIdFromToken();
-        try{
-//            Address address = addressRepository.save(new Address(currentUserId, newOrderPayload.getShippingAddress(),
-//                    newOrderPayload.getPhoneNumber()));
-//            List<MapPOJO> orders = newOrderPayload.getProductsIdWithQty();
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-            NewOrderPayload order = objectMapper.readValue((byte[]) newOrderPayload, NewOrderPayload.class);
 
-//            orders.forEach((key, value) -> {
-//                System.out.println(key + ", " + value);
-//            });
-        } catch (Exception e){
-            return new ResponseEntity<>(new MessageResponse("Order cannot be created"), HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity<>(new MessageResponse("Order created successfully."), HttpStatus.OK);
-    }
 
 //    @PostMapping(value = "/")
 //    public ResponseEntity<?> createOrder(@RequestBody List<Order> orderDetails) {

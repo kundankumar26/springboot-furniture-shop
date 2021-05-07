@@ -13,11 +13,11 @@ public class Address {
 
     private String address;
 
-    private int phoneNumber;
+    private String phoneNumber;
 
     public Address(){ }
 
-    public Address(long userId, String address, int phoneNumber) {
+    public Address(long userId, String address, String phoneNumber) {
         this.userId = userId;
         this.address = address;
         this.phoneNumber = phoneNumber;
@@ -47,11 +47,11 @@ public class Address {
         this.address = address;
     }
 
-    public int getPhoneNumber() {
+    public String getPhoneNumber() {
         return phoneNumber;
     }
 
-    public void setPhoneNumber(int phoneNumber) {
+    public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
 }

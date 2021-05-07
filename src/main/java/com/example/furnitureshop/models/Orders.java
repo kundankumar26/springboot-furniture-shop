@@ -15,6 +15,8 @@ public class Orders {
 
     private long productId;
 
+    private String productCategory;
+
     private long addressId;
 
     private int qty;
@@ -29,9 +31,10 @@ public class Orders {
 
     public Orders(){ }
 
-    public Orders(long userId, long productId, long addressId, int qty, Date orderDate, int isRejectedByAdmin) {
+    public Orders(long userId, long productId, String productCategory, long addressId, int qty, Date orderDate, int isRejectedByAdmin) {
         this.userId = userId;
         this.productId = productId;
+        this.productCategory = productCategory;
         this.addressId = addressId;
         this.qty = qty;
         this.orderDate = orderDate;
@@ -60,6 +63,14 @@ public class Orders {
 
     public void setProductId(long productId) {
         this.productId = productId;
+    }
+
+    public String getProductCategory() {
+        return productCategory;
+    }
+
+    public void setProductCategory(String productCategory) {
+        this.productCategory = productCategory;
     }
 
     public long getAddressId() {
