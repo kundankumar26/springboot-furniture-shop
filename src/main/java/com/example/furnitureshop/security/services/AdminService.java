@@ -1,31 +1,49 @@
 package com.example.furnitureshop.security.services;
 
-import com.example.furnitureshop.models.Order;
+import com.example.furnitureshop.exceptions.ResourceNotFoundException;
+import com.example.furnitureshop.models.Orders;
 import com.example.furnitureshop.payload.response.MessageResponse;
+import com.example.furnitureshop.repository.AdminRepository;
 import com.example.furnitureshop.repository.FurnitureRepository;
+import com.example.furnitureshop.repository.FurnituresRepository;
 import com.example.furnitureshop.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-
 @Service
 public class AdminService {
-    @Autowired
-    private FurnitureRepository furnitureRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private AdminRepository adminRepository;
+
+    @Autowired
+    private FurnituresRepository furnituresRepository;
 
     //Get orders that are unchecked
     public ResponseEntity<?> getUncheckedOrders(){
-        return new ResponseEntity<>(furnitureRepository.findUncheckedOrders(), HttpStatus.OK);
+        return new ResponseEntity<>(adminRepository.findUncheckedOrders(), HttpStatus.OK);
     }
 
     //Get accepted or rejected orders
     public ResponseEntity<?> getOldOrders() {
-        return new ResponseEntity<>(furnitureRepository.findOldOrders(), HttpStatus.OK);
+        return new ResponseEntity<>(adminRepository.findOldOrders(), HttpStatus.OK);
+    }
+
+    public ResponseEntity<?> updateOrderByAdmin(Long orderId, Orders orderDetails) {
+        Orders order = furnituresRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not exist with id :" + orderId));
+        order.setIsRejectedByAdmin(orderDetails.getIsRejectedByAdmin());
+        order.setQty(orderDetails.getQty());
+        Orders updatedOrder = furnituresRepository.save(order);
+        return new ResponseEntity<>(updatedOrder, HttpStatus.OK);
+    }
+
+    public ResponseEntity<?> deleteOrder(Long orderId) {
+        Orders order = furnituresRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order cannot be deleted"));
+        furnituresRepository.delete(order);
+        return new ResponseEntity<>(new MessageResponse("Order was deleted successfully."), HttpStatus.OK);
     }
 }

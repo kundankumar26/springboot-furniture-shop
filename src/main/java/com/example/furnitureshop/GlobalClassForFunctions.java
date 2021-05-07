@@ -39,6 +39,12 @@ public class GlobalClassForFunctions {
         return SecurityContextHolder.getContext().getAuthentication().getName();
     }
 
+    //Get the user id of current user
+    public static long getUserIdFromToken(){
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return userDetails.getId();
+    }
+
     //Create the template for order placed and order confirmed emails
     public static MimeMessage sendEmailForOrder(MimeMessage mimeMessage, String to, String subject, String OrderType,
                                                 StringBuilder ordersStringBuilder, String employeeName) throws MessagingException {

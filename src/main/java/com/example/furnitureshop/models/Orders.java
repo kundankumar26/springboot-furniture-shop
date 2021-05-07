@@ -23,7 +23,7 @@ public class Orders {
 
     private Date shippedDate;
 
-    private Date DeliveryDate;
+    private Date deliveryDate;
 
     private int isRejectedByAdmin;
 
@@ -95,11 +95,11 @@ public class Orders {
     }
 
     public Date getDeliveryDate() {
-        return DeliveryDate;
+        return deliveryDate;
     }
 
     public void setDeliveryDate(Date deliveryDate) {
-        DeliveryDate = deliveryDate;
+        this.deliveryDate = deliveryDate;
     }
 
     public int getIsRejectedByAdmin() {

@@ -2,6 +2,7 @@ package com.example.furnitureshop.controllers;
 
 import com.example.furnitureshop.exceptions.ResourceNotFoundException;
 import com.example.furnitureshop.models.Order;
+import com.example.furnitureshop.models.Orders;
 import com.example.furnitureshop.payload.response.MessageResponse;
 import com.example.furnitureshop.security.services.AdminService;
 import com.example.furnitureshop.security.services.FurnitureService;
@@ -29,8 +30,9 @@ public class AdminController {
     @Autowired
     private AdminService adminService;
 
+    //Get unchecked orders
     @GetMapping(value = "/")
-    public ResponseEntity<?> getOrders() {
+    public ResponseEntity<?> getUncheckedOrders() {
         ResponseEntity<?> responseEntity;
         try {
             responseEntity = adminService.getUncheckedOrders();
@@ -40,6 +42,7 @@ public class AdminController {
         return new ResponseEntity<>(responseEntity, HttpStatus.OK);
     }
 
+    //Get accepted or rejected orders
     @GetMapping(value = "/view-all")
     public ResponseEntity<?> getPreviousOrders() {
         ResponseEntity<?> responseEntity;
@@ -51,37 +54,39 @@ public class AdminController {
         return new ResponseEntity<>(responseEntity, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/page={pageNumber}&sort={sortBy}")
-    public ResponseEntity<?> getOrders(@PathVariable int pageNumber, @PathVariable String sortBy) {
-        ResponseEntity<?> responseEntity;
-        try{
-            Pageable pageable = PageRequest.of(pageNumber, 5, Sort.by(sortBy));
-            responseEntity = furnitureService.getAllOrdersByPages(pageable);
-        } catch(Exception e){
-            return new ResponseEntity<>(new ResourceNotFoundException("Cannot get the orders"), HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(responseEntity, HttpStatus.OK);
-    }
+//    @GetMapping(value = "/page={pageNumber}&sort={sortBy}")
+//    public ResponseEntity<?> getOrders(@PathVariable int pageNumber, @PathVariable String sortBy) {
+//        ResponseEntity<?> responseEntity;
+//        try{
+//            Pageable pageable = PageRequest.of(pageNumber, 5, Sort.by(sortBy));
+//            responseEntity = furnitureService.getAllOrdersByPages(pageable);
+//        } catch(Exception e){
+//            return new ResponseEntity<>(new ResourceNotFoundException("Cannot get the orders"), HttpStatus.NOT_FOUND);
+//        }
+//        return new ResponseEntity<>(responseEntity, HttpStatus.OK);
+//    }
 
+    //Update qty and is rejected by admin field
     @PatchMapping(value = "/{orderId}")
-    public ResponseEntity<?> updateOrder(@PathVariable Long orderId, @RequestBody Order orderDetails){
+    public ResponseEntity<?> updateOrder(@PathVariable Long orderId, @RequestBody Orders orderDetails){
         ResponseEntity<?> responseEntity;
         try{
-            responseEntity = furnitureService.updateOrderByAdmin(orderId, orderDetails);
+            responseEntity = adminService.updateOrderByAdmin(orderId, orderDetails);
         } catch(Exception e){
             return new ResponseEntity<>(new MessageResponse("Order cannot be updated"), HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(responseEntity, HttpStatus.OK);
     }
 
+    //Delete order with this id
     @DeleteMapping(value = "/{orderId}")
     public ResponseEntity<?> deleteOrder(@PathVariable Long orderId){
         ResponseEntity<?> responseEntity;
         try{
-            responseEntity = furnitureService.deleteOrder(orderId);
+            responseEntity = adminService.deleteOrder(orderId);
         } catch(Exception e){
             return new ResponseEntity<>(new MessageResponse("Order cannot be deleted"), HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(responseEntity, HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(responseEntity, HttpStatus.OK);
     }
 }
