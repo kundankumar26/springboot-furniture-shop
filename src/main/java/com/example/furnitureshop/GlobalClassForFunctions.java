@@ -589,6 +589,7 @@ public class GlobalClassForFunctions {
         return message;
     }
 
+
     //Create the template for placed order
     public static String sendEmailForPlacedOrder(List<EmployeeResponseTable> orderDetails){
         StringBuilder stringBuilder = new StringBuilder();
@@ -600,10 +601,13 @@ public class GlobalClassForFunctions {
         for(EmployeeResponseTable order: orderDetails){
             stringBuilder.append("<tr style=\"font-size: 16px; border-bottom: 2px solid #e7e7e7;\">\n" +
                     "                          <td style=\"padding: 10px 0 10px 20px; text-align: left;\">")
-            .append(order.getOrderId())
-            .append("</td>\n" + "<td style=\"padding: 10px 0 10px 20px; text-align: left;\">").append(order.getProductName())
-            .append("</td>\n" + "<td style=\"padding: 10px 0 10px 20px; text-align: left;\">").append(order.getQty())
-            .append("</td>\n" + "</tr>\n");
+                    .append("<img src=").append(order.getProductImageUrl())
+                        .append(" width=100px height=70px />")
+                    .append("</td>\n" + "<td style=\"padding: 10px 0 10px 20px; text-align: left;\">").append(order.getOrderId())
+                    .append("</td>\n" + "<td style=\"padding: 10px 0 10px 20px; text-align: left;\">").append(order.getProductName())
+                    .append("</td>\n" + "<td style=\"padding: 10px 0 10px 20px; text-align: left;\">").append(order.getQty())
+                    .append("</td>\n" + "<td style=\"padding: 10px 0 10px 20px; text-align: left;\">").append(order.getProductPrice())
+                    .append("</td>\n" + "</tr>\n");
         }
 
         String message = "<!DOCTYPE html>\n" +
@@ -754,12 +758,14 @@ public class GlobalClassForFunctions {
                 "                  </tr>\n" +
                 "                  \n" +
                 "                  <tr>\n" +
-                "                    <td bgcolor=\"#ffffff\" align=\"left\" style=\"padding: 20px 30px 40px 30px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; line-height: 25px;\">\n" +
+                "                    <td bgcolor=\"#ffffff\" align=\"left\" style=\"padding: 20px 30px 40px 30px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 25px;\">\n" +
                 "                      <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"padding: 50px;\">\n" +
                 "                        <tr bgcolor=\"#efefef\" style=\"border-radius: 5px; border-bottom: 2px solid #e7e7e7;\">\n" +
+                "                          <th style=\"padding: 10px 0 10px 20px; text-align: left;\"> </th>\n" +
                 "                          <th style=\"padding: 10px 0 10px 20px; text-align: left;\">ORDER ID</th>\n" +
-                "                          <th style=\"padding: 10px 0 10px 20px; text-align: left;\">ITEM REQUESTED</th>\n" +
+                "                          <th style=\"padding: 10px 0 10px 20px; text-align: left;\">PRODUCT NAME</th>\n" +
                 "                          <th style=\"padding: 10px 0 10px 20px; text-align: left;\">QTY</th>\n" +
+                "                          <th style=\"padding: 10px 0 10px 20px; text-align: left;\">PRICE</th>\n" +
                 "                        </tr>\n" + stringBuilder +
                 "                      </table>\n" +
                 "                    </td>\n" +
