@@ -40,10 +40,11 @@ public class EmailSenderService {
     }
 
     @Async
-    public void sendConfirmedOrderEmail(Order updatedOrder) throws MessagingException {
+    public void sendConfirmedOrderEmail(EmployeeResponseTable updatedOrder) throws MessagingException {
 
-        String message = GlobalClassForFunctions.sendEmailForShippedDate(updatedOrder.getOrderId(), updatedOrder.getItemRequested(), updatedOrder.getQty(),
-                updatedOrder.getShippingAddress() + "<br>Phn no: " + updatedOrder.getPhnNo(), updatedOrder.getShippedDate().substring(0, 10));
+        String message = GlobalClassForFunctions.sendEmailForShippedDate(updatedOrder.getOrderId(), updatedOrder.getProductName(), updatedOrder.getQty(),
+                updatedOrder.getAddress() + "<br>Phn no: " + updatedOrder.getPhoneNumber(),
+                GlobalClassForFunctions.getDateFromOrder(updatedOrder.getShippedDate()));
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, "utf-8");
         mimeMessageHelper.setTo(updatedOrder.getEmail());

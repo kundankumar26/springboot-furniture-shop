@@ -22,4 +22,14 @@ public class AddressService {
         }
         return address;
     }
+
+    public Address findAddressById(long addressId){
+        Address address;
+        try {
+            address = addressRepository.findById(addressId).orElseThrow(() -> new RuntimeException("Cannot found the address"));
+        } catch(Exception e){
+            return null;
+        }
+        return address;
+    }
 }

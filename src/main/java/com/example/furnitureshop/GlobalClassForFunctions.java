@@ -31,6 +31,13 @@ public class GlobalClassForFunctions {
         return shippedDate;
     }
 
+    //Parse date from order
+    public static String getDateFromOrder(Date date) {
+        String shippedDate = null;
+        shippedDate = new SimpleDateFormat("E, dd MMM").format(date);
+        return shippedDate;
+    }
+
     //Get the username from securitycontextholder
     public static String getUserNameFromToken(){
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -589,7 +596,7 @@ public class GlobalClassForFunctions {
         String itemShippingAddress = address.substring(0, 1).toUpperCase() + address.substring(1, address.length()).toLowerCase(Locale.ROOT) +
                 "<br>Phn no: " + orderDetails.get(0).getPhoneNumber();
         //String itemOrderDate = orderDetails.get(0).getOrderDate().getDate();
-        String itemOrderDate = "20//12/1918";
+        String itemOrderDate = getDateFromOrder(orderDetails.get(0).getOrderDate());
         for(EmployeeResponseTable order: orderDetails){
             stringBuilder.append("<tr style=\"font-size: 16px; border-bottom: 2px solid #e7e7e7;\">\n" +
                     "                          <td style=\"padding: 10px 0 10px 20px; text-align: left;\">")

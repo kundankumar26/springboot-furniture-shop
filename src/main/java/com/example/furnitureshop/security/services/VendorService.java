@@ -2,6 +2,7 @@ package com.example.furnitureshop.security.services;
 
 import com.example.furnitureshop.GlobalClassForFunctions;
 import com.example.furnitureshop.exceptions.ResourceNotFoundException;
+import com.example.furnitureshop.models.EmployeeResponseTable;
 import com.example.furnitureshop.models.Order;
 import com.example.furnitureshop.models.Orders;
 import com.example.furnitureshop.repository.FurnituresRepository;
@@ -24,7 +25,7 @@ public class VendorService {
         return new ResponseEntity<>(vendorRepository.findOrdersForVendor(), HttpStatus.OK);
     }
 
-    public Orders updateOrderByVendor(long orderId, Orders orderDetails) {
+    public EmployeeResponseTable updateOrderByVendor(long orderId, EmployeeResponseTable orderDetails) {
         Orders order = furnituresRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not exist with id :" + orderId));
 
@@ -36,7 +37,8 @@ public class VendorService {
 //                    order.getOrderDate().compareTo(orderDetails.getShippedDate()));
             //System.out.println(new Date(new Date(System.currentTimeMillis()).getDate() - new Date(orderDetails.getShippedDate()));
             order.setShippedDate(orderDetails.getShippedDate());
-            return furnituresRepository.save(order);
+            furnituresRepository.save(order);
+            return orderDetails;
         }
         return null;
     }
