@@ -33,15 +33,14 @@ public class ProductService {
         return new ResponseEntity<>(productRepository.save(product), HttpStatus.OK);
     }
 
-    public String findProductCategoryById(long productId) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("not found"));
-        return product.getProductCategory();
-    }
-
-    public Product findByProductId(long productId) {
-        return productRepository.findById(productId)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not exist with id :" + productId));
+    public Product findProductById(long productId) {
+        Product product;
+        try {
+            product = productRepository.findById(productId).orElseThrow(() -> new RuntimeException("not found"));
+        } catch(Exception e){
+            return null;
+        }
+        return product;
     }
 
     public Product updateProduct(Product product){

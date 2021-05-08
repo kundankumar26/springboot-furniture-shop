@@ -38,7 +38,7 @@ public class EmployeeResponseTable {
     private String productImageUrl;
     private int qty;
     private String address;
-    private int phoneNumber;
+    private String phoneNumber;
     private Date orderDate;
     private Date shippedDate;
     private Date deliveryDate;
@@ -47,7 +47,7 @@ public class EmployeeResponseTable {
 
     public EmployeeResponseTable(long orderId, String empFirstName, String empLastName, String email, int isRejectedByAdmin,
                                  String productName, String productCategory, int productPrice, int productRating,
-                                 long productQty, String productImageUrl, int qty, String address, int phoneNumber,
+                                 long productQty, String productImageUrl, int qty, String address, String phoneNumber,
                                  Date orderDate, Date shippedDate, Date deliveryDate) {
         this.orderId = orderId;
         this.empFirstName = empFirstName;
@@ -172,11 +172,11 @@ public class EmployeeResponseTable {
         this.address = address;
     }
 
-    public int getPhoneNumber() {
+    public String getPhoneNumber() {
         return phoneNumber;
     }
 
-    public void setPhoneNumber(int phoneNumber) {
+    public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
 

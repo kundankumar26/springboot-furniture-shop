@@ -77,8 +77,8 @@ public class AdminController {
         ResponseEntity<?> responseEntity;
         try{
             if(orderDetails.getIsRejectedByAdmin() == 1) {
-                Product product = productService.findByProductId(orderDetails.getProductId());
-                if (product.getProductQty() < orderDetails.getQty()) {
+                Product product = productService.findProductById(orderDetails.getProductId());
+                if (product == null || product.getProductQty() < orderDetails.getQty()) {
                     return new ResponseEntity<>(new MessageResponse("Product qty cannot be satisfied."), HttpStatus.NOT_FOUND);
                 }
                 product.setProductQty(product.getProductQty() - orderDetails.getQty());

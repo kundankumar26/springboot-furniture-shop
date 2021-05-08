@@ -1,8 +1,6 @@
 package com.example.furnitureshop;
 
-import com.example.furnitureshop.models.FirstLastUsernameValid;
-import com.example.furnitureshop.models.Order;
-import com.example.furnitureshop.models.PasswordStrength;
+import com.example.furnitureshop.models.*;
 import com.example.furnitureshop.payload.response.MessageResponse;
 import com.example.furnitureshop.security.services.UserDetailsImpl;
 import org.springframework.http.HttpStatus;
@@ -14,6 +12,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -203,6 +202,23 @@ public class GlobalClassForFunctions {
         itemListMap.put("HP Monitor", "Monitor");
         itemListMap.put("Chair", "Chair");
         return itemListMap.get(item);
+    }
+
+    //Create the employee response table from address, orders and product
+    public static EmployeeResponseTable createResponseForOrder(Product product, Address address, Orders orders, User user){
+        EmployeeResponseTable employeeResponseTable = new EmployeeResponseTable();
+        employeeResponseTable.setOrderId(orders.getOrderId());
+        employeeResponseTable.setOrderDate(orders.getOrderDate());
+        employeeResponseTable.setProductName(product.getProductName());
+        employeeResponseTable.setProductImageUrl(product.getProductImageUrl());
+        employeeResponseTable.setProductPrice(product.getProductPrice());
+        employeeResponseTable.setQty(orders.getQty());
+        employeeResponseTable.setAddress(address.getAddress());
+        employeeResponseTable.setPhoneNumber(address.getPhoneNumber());
+        employeeResponseTable.setEmpFirstName(user.getEmpFirstName());
+        employeeResponseTable.setEmpLastName(user.getEmpLastName());
+        employeeResponseTable.setEmail(user.getEmail());
+        return employeeResponseTable;
     }
 
     //Create the template for account verification
@@ -567,17 +583,18 @@ public class GlobalClassForFunctions {
     }
 
     //Create the template for placed order
-    public static String sendEmailForPlacedOrder(List<Order> orderDetails){
+    public static String sendEmailForPlacedOrder(List<EmployeeResponseTable> orderDetails){
         StringBuilder stringBuilder = new StringBuilder();
-        String address = orderDetails.get(0).getShippingAddress();
+        String address = orderDetails.get(0).getAddress();
         String itemShippingAddress = address.substring(0, 1).toUpperCase() + address.substring(1, address.length()).toLowerCase(Locale.ROOT) +
-                "<br>Phn no: " + orderDetails.get(0).getPhnNo();
-        String itemOrderDate = orderDetails.get(0).getOrderDate().substring(0, 10);
-        for(Order order: orderDetails){
+                "<br>Phn no: " + orderDetails.get(0).getPhoneNumber();
+        //String itemOrderDate = orderDetails.get(0).getOrderDate().getDate();
+        String itemOrderDate = "20//12/1918";
+        for(EmployeeResponseTable order: orderDetails){
             stringBuilder.append("<tr style=\"font-size: 16px; border-bottom: 2px solid #e7e7e7;\">\n" +
                     "                          <td style=\"padding: 10px 0 10px 20px; text-align: left;\">")
             .append(order.getOrderId())
-            .append("</td>\n" + "<td style=\"padding: 10px 0 10px 20px; text-align: left;\">").append(order.getItemRequested())
+            .append("</td>\n" + "<td style=\"padding: 10px 0 10px 20px; text-align: left;\">").append(order.getProductName())
             .append("</td>\n" + "<td style=\"padding: 10px 0 10px 20px; text-align: left;\">").append(order.getQty())
             .append("</td>\n" + "</tr>\n");
         }

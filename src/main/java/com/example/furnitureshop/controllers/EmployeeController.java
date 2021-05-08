@@ -6,10 +6,8 @@ import com.example.furnitureshop.models.*;
 import com.example.furnitureshop.payload.response.MessageResponse;
 import com.example.furnitureshop.repository.AddressRepository;
 import com.example.furnitureshop.repository.FurnituresRepository;
-import com.example.furnitureshop.security.services.EmailSenderService;
-import com.example.furnitureshop.security.services.EmployeeService;
-import com.example.furnitureshop.security.services.FurnitureService;
-import com.example.furnitureshop.security.services.ProductService;
+import com.example.furnitureshop.repository.UserRepository;
+import com.example.furnitureshop.security.services.*;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.aspectj.weaver.ast.Or;
@@ -42,6 +40,13 @@ public class EmployeeController {
 
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private AddressService addressService;
+
 
 
     @Autowired
@@ -77,27 +82,32 @@ public class EmployeeController {
         ResponseEntity<?> responseEntity = null;
         try{
             long currentUserId = GlobalClassForFunctions.getUserIdFromToken();
-            Address address = addressRepository.save(new Address(currentUserId, newOrderPayload.get(0).getAddress(),
-                    newOrderPayload.get(0).getPhoneNumber()));
+            Address address = addressService.createAddress(currentUserId, newOrderPayload.get(0));
+            User user = userService.findUserById(currentUserId);
+            if(address == null || user == null){
+                throw new RuntimeException("Cannot create the order");
+            }
 
             List<Orders> ordersList = new ArrayList<>();
+            List<EmployeeResponseTable> createdOrders = new ArrayList<>();
             for(EmployeeRequest employeeRequest: newOrderPayload){
-                String productCategory = productService.findProductCategoryById(employeeRequest.getProductId());
-                if(employeeService.findIsProductOrdered(currentUserId, productCategory)){
+                Product product = productService.findProductById(employeeRequest.getProductId());
+                if(product == null || employeeService.findIsProductOrdered(currentUserId, product.getProductCategory())){
                     continue;
                 }
-                Orders orders = new Orders(currentUserId, employeeRequest.getProductId(), productCategory, address.getAddressId(),
+                Orders orders = new Orders(currentUserId, employeeRequest.getProductId(), product.getProductCategory(), address.getAddressId(),
                         employeeRequest.getQty(), new Date(), 0);
                 ordersList.add(employeeService.createOrders(orders));
+
+                createdOrders.add(GlobalClassForFunctions.createResponseForOrder(product, address, orders, user));
             }
+
             if(ordersList.size() > 0) {
                 responseEntity = new ResponseEntity<>(ordersList, HttpStatus.CREATED);
+                emailSenderService.sendOrderPlacedEmail(createdOrders);
             } else {
                 return new ResponseEntity<>(new MessageResponse("Product already ordered."), HttpStatus.BAD_REQUEST);
             }
-//            if(ordersList.size() > 0){
-//                emailSenderService.sendOrderPlacedEmail(ordersList);
-//            }
         } catch (Exception e){
             return new ResponseEntity<>(new MessageResponse("Order cannot be created."), HttpStatus.BAD_REQUEST);
         }

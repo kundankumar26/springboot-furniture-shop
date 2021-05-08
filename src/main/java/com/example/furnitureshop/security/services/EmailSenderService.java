@@ -1,6 +1,7 @@
 package com.example.furnitureshop.security.services;
 
 import com.example.furnitureshop.GlobalClassForFunctions;
+import com.example.furnitureshop.models.EmployeeResponseTable;
 import com.example.furnitureshop.models.Order;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
@@ -52,7 +53,7 @@ public class EmailSenderService {
     }
 
     @Async
-    public void sendOrderPlacedEmail(List<Order> orderDetails) throws MessagingException {
+    public void sendOrderPlacedEmail(List<EmployeeResponseTable> orderDetails) throws MessagingException {
         String message = GlobalClassForFunctions.sendEmailForPlacedOrder(orderDetails);
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, "utf-8");

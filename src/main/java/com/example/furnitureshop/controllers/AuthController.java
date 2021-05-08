@@ -87,7 +87,6 @@ public class AuthController {
 
         for(String role: roles){
             System.out.println(role + " " + jwt);
-            System.out.println(UUID.randomUUID().toString());
         }
 
         return ResponseEntity.ok(new JwtResponse(jwt, userDetails.getId(), userDetails.getUsername(),
@@ -171,7 +170,7 @@ public class AuthController {
         ConfirmationToken confirmationToken = new ConfirmationToken(user);
         confirmationTokenRepository.save(confirmationToken);
 
-        //emailSenderService.sendConfirmationEmail(user.getEmail(), confirmationToken.getConfirmationToken());
+        emailSenderService.sendConfirmationEmail(user.getEmail(), confirmationToken.getConfirmationToken());
 
 
 //        SimpleMailMessage mailMessage = new SimpleMailMessage();
