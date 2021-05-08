@@ -32,8 +32,8 @@ public class VendorService {
 //                order.getOrderDate().compareTo(orderDetails.getShippedDate()));
 
         if(orderDetails.getShippedDate() != null) {
-            System.out.println(order.getOrderDate()+" "+ orderDetails.getShippedDate() + " " +
-                    order.getOrderDate().compareTo(orderDetails.getShippedDate()));
+//            System.out.println(order.getOrderDate()+" "+ orderDetails.getShippedDate() + " " +
+//                    order.getOrderDate().compareTo(orderDetails.getShippedDate()));
             //System.out.println(new Date(new Date(System.currentTimeMillis()).getDate() - new Date(orderDetails.getShippedDate()));
             order.setShippedDate(orderDetails.getShippedDate());
             return furnituresRepository.save(order);

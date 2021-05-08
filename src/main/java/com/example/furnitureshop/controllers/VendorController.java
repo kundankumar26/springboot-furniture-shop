@@ -64,7 +64,7 @@ public class VendorController {
         } catch (Exception e) {
             return new ResponseEntity<>(new MessageResponse("Order cannot be updated"), HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(new MessageResponse("Order updated successfully."), HttpStatus.OK);
+        return new ResponseEntity<>(updatedOrder, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/{path}", method = {RequestMethod.GET, RequestMethod.POST})
