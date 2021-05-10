@@ -10,7 +10,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class ProductService {
@@ -21,7 +23,7 @@ public class ProductService {
     private UserRepository userRepository;
 
     public ResponseEntity<?> findAllProducts() {
-        return new ResponseEntity<>(productRepository.findAllProducts(), HttpStatus.OK);
+        return new ResponseEntity<>(productRepository.findAll(), HttpStatus.OK);
     }
 
     public ResponseEntity<?> createProduct(int userId, Product product) {
@@ -45,5 +47,15 @@ public class ProductService {
 
     public Product updateProduct(Product product){
         return productRepository.save(product);
+    }
+
+    public List<Product> findProductsForCart(Set<Long> productIds) {
+        List<Product> productList = null;
+        try {
+            productList = productRepository.findProductsForCart(productIds);
+        } catch(Exception e){
+            return null;
+        }
+        return productList;
     }
 }

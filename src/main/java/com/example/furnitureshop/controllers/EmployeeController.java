@@ -3,6 +3,7 @@ package com.example.furnitureshop.controllers;
 import aj.org.objectweb.asm.TypeReference;
 import com.example.furnitureshop.GlobalClassForFunctions;
 import com.example.furnitureshop.models.*;
+import com.example.furnitureshop.payload.request.CartRequestPayload;
 import com.example.furnitureshop.payload.response.MessageResponse;
 import com.example.furnitureshop.repository.AddressRepository;
 import com.example.furnitureshop.repository.FurnituresRepository;
@@ -112,6 +113,11 @@ public class EmployeeController {
             return new ResponseEntity<>(new MessageResponse("Order cannot be created."), HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(responseEntity, HttpStatus.CREATED);
+    }
+
+    @PostMapping(value = "/test")
+    public void testInput(@RequestBody CartRequestPayload values){
+        System.out.println(values);
     }
 
 //    @GetMapping(value = "/{empId}")
