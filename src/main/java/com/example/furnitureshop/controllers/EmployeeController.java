@@ -48,6 +48,9 @@ public class EmployeeController {
     @Autowired
     private AddressService addressService;
 
+    @Autowired
+    private CartService cartService;
+
 
 
     @Autowired
@@ -72,10 +75,10 @@ public class EmployeeController {
 
     //Create multiple orders
     @PostMapping(value = "/")
-    public ResponseEntity<?> createOrder(@RequestBody List<EmployeeRequest> newOrderPayload){
+    public ResponseEntity<?> createOrder(@RequestBody EmployeeRequest newOrderPayload){
 
-        String checkAddAndPhone = GlobalClassForFunctions.checkAddressAndPhoneNo(newOrderPayload.get(0).getAddress(),
-                newOrderPayload.get(0).getPhoneNumber());
+        String checkAddAndPhone = GlobalClassForFunctions.checkAddressAndPhoneNo(newOrderPayload.getAddress(),
+                newOrderPayload.getPhoneNumber());
         if(checkAddAndPhone.length() > 0){
             return new ResponseEntity<>(new MessageResponse(checkAddAndPhone), HttpStatus.NOT_FOUND);
         }
@@ -83,7 +86,7 @@ public class EmployeeController {
         ResponseEntity<?> responseEntity = null;
         try{
             long currentUserId = GlobalClassForFunctions.getUserIdFromToken();
-            Address address = addressService.createAddress(currentUserId, newOrderPayload.get(0));
+            Address address = addressService.createAddress(currentUserId, newOrderPayload);
             User user = userService.findUserById(currentUserId);
             if(address == null || user == null){
                 throw new RuntimeException("Cannot create the order");
@@ -91,13 +94,14 @@ public class EmployeeController {
 
             List<Orders> ordersList = new ArrayList<>();
             List<EmployeeResponseTable> createdOrders = new ArrayList<>();
-            for(EmployeeRequest employeeRequest: newOrderPayload){
-                Product product = productService.findProductById(employeeRequest.getProductId());
+            List<Long> productIds = newOrderPayload.getProductIds();
+            for(int i = 0; i < productIds.size(); i++) {
+                Product product = productService.findProductById(productIds.get(i));
                 if(product == null || employeeService.findIsProductOrdered(currentUserId, product.getProductCategory())){
                     continue;
                 }
-                Orders orders = new Orders(currentUserId, employeeRequest.getProductId(), product.getProductCategory(), address.getAddressId(),
-                        employeeRequest.getQty(), new Date(), 0);
+                Orders orders = new Orders(currentUserId, productIds.get(i), product.getProductCategory(), address.getAddressId(),
+                        newOrderPayload.getQty().get(i), new Date(), 0);
                 ordersList.add(employeeService.createOrders(orders));
 
                 createdOrders.add(GlobalClassForFunctions.createResponseForOrder(product, address, orders, user));
@@ -106,8 +110,9 @@ public class EmployeeController {
             if(ordersList.size() > 0) {
                 responseEntity = new ResponseEntity<>(ordersList, HttpStatus.CREATED);
                 emailSenderService.sendOrderPlacedEmail(createdOrders);
+                cartService.deleteByProductId(currentUserId, productIds);
             } else {
-                return new ResponseEntity<>(new MessageResponse("Product already ordered."), HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(new MessageResponse("Product already ordered."), HttpStatus.NOT_FOUND);
             }
         } catch (Exception e){
             return new ResponseEntity<>(new MessageResponse("Order cannot be created."), HttpStatus.BAD_REQUEST);

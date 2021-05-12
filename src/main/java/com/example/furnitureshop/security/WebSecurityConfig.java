@@ -66,12 +66,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests((authorizeRequests) -> {
                     authorizeRequests
                             .antMatchers("/employee/**").hasAnyRole("EMPLOYEE")
+                            .antMatchers("/wishlist").hasAnyRole("EMPLOYEE")
+                            .antMatchers("/cart").hasAnyRole("EMPLOYEE")
                             .antMatchers("/vendor/**").hasRole("VENDOR")
                             .antMatchers("/admin/**").hasRole("ADMIN");
                     })
                 .authorizeRequests()
                 .antMatchers("/products").permitAll()
-                .antMatchers("/cart").permitAll()
                 .antMatchers("/signup").permitAll()
                 .antMatchers("/signin").permitAll().and()
                 .authorizeRequests().anyRequest().permitAll().and()

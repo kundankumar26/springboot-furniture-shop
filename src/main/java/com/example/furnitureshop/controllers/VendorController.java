@@ -57,7 +57,9 @@ public class VendorController {
         try{
             vendorService.updateOrderByVendor(orderId, orderDetails);
             emailSenderService.sendConfirmedOrderEmail(orderDetails);
-        } catch (Exception e) {
+        } catch (RuntimeException runtimeException) {
+            return new ResponseEntity<>(new MessageResponse("Shipped date cannot be less than order date"), HttpStatus.BAD_REQUEST);
+        } catch (Exception e){
             return new ResponseEntity<>(new MessageResponse("Order cannot be updated"), HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(orderDetails, HttpStatus.OK);

@@ -1,6 +1,8 @@
 package com.example.furnitureshop.controllers;
 
 import com.example.furnitureshop.GlobalClassForFunctions;
+import com.example.furnitureshop.models.Cart;
+import com.example.furnitureshop.models.Product;
 import com.example.furnitureshop.payload.response.MessageResponse;
 import com.example.furnitureshop.security.services.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,21 +33,22 @@ public class CartController {
     }
 
     @PostMapping(value = "/")
-    public ResponseEntity<?> addOrder(@RequestBody long productId) {
+    public ResponseEntity<?> addOrder(@RequestBody Product product) {
         ResponseEntity<?> responseEntity = null;
         try {
             long userId = GlobalClassForFunctions.getUserIdFromToken();
-            responseEntity = new ResponseEntity<>(cartService.addOrderToCart(userId, productId), HttpStatus.OK);
+            responseEntity = new ResponseEntity<>(cartService.addOrderToCart(userId, product.getProductId()), HttpStatus.OK);
         } catch(Exception e){
             return new ResponseEntity<>(new MessageResponse("Failed to add to cart"), HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(responseEntity, HttpStatus.OK);
     }
 
-    @DeleteMapping(value = "/")
-    public ResponseEntity<?> deleteFromCart(@RequestBody long cartId) {
+    @DeleteMapping(value = "/{cartId}")
+    public ResponseEntity<?> deleteFromCart(@PathVariable(value = "cartId") String cartid) {
         ResponseEntity<?> responseEntity = null;
         try {
+            long cartId = Long.parseLong(cartid);
             responseEntity = cartService.deleteFromCart(cartId);
         } catch (Exception e){
             return new ResponseEntity<>(new MessageResponse("Failed to delete"), HttpStatus.NOT_FOUND);

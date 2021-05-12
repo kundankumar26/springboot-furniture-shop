@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+
 @Service
 public class VendorService {
 
@@ -29,13 +31,10 @@ public class VendorService {
         Orders order = furnituresRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not exist with id :" + orderId));
 
-//        System.out.println(order.getOrderDate()+" "+ orderDetails.getShippedDate() + " " +
-//                order.getOrderDate().compareTo(orderDetails.getShippedDate()));
-
         if(orderDetails.getShippedDate() != null) {
-//            System.out.println(order.getOrderDate()+" "+ orderDetails.getShippedDate() + " " +
-//                    order.getOrderDate().compareTo(orderDetails.getShippedDate()));
-            //System.out.println(new Date(new Date(System.currentTimeMillis()).getDate() - new Date(orderDetails.getShippedDate()));
+            if(orderDetails.getShippedDate().getTime() < order.getOrderDate().getTime()){
+                throw new RuntimeException("Shipped date cannot be less than order date");
+            }
             order.setShippedDate(orderDetails.getShippedDate());
             furnituresRepository.save(order);
             return orderDetails;

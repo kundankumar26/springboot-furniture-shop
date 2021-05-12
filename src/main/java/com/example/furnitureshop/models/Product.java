@@ -27,14 +27,14 @@ public class Product {
     private long productQty;
 
     @NotNull
-    private int productRating;
+    private double productRating;
 
     @NotBlank
     private String productImageUrl;
 
     public Product(){}
 
-    public Product(String productCategory, String productName, int productPrice, String productDescription, long productQty, int productRating, String productImageUrl) {
+    public Product(String productCategory, String productName, int productPrice, String productDescription, long productQty, double productRating, String productImageUrl) {
         this.productCategory = productCategory;
         this.productName = productName;
         this.productPrice = productPrice;
@@ -92,11 +92,11 @@ public class Product {
         this.productQty = productQty;
     }
 
-    public int getProductRating() {
+    public double getProductRating() {
         return productRating;
     }
 
-    public void setProductRating(int productRating) {
+    public void setProductRating(double productRating) {
         this.productRating = productRating;
     }
 

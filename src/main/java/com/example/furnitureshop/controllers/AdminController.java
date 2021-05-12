@@ -35,6 +35,7 @@ public class AdminController {
     @Autowired
     private ProductService productService;
 
+
     //Get unchecked orders
     @GetMapping(value = "/")
     public ResponseEntity<?> getUncheckedOrders() {
@@ -59,18 +60,6 @@ public class AdminController {
         return new ResponseEntity<>(responseEntity, HttpStatus.OK);
     }
 
-//    @GetMapping(value = "/page={pageNumber}&sort={sortBy}")
-//    public ResponseEntity<?> getOrders(@PathVariable int pageNumber, @PathVariable String sortBy) {
-//        ResponseEntity<?> responseEntity;
-//        try{
-//            Pageable pageable = PageRequest.of(pageNumber, 5, Sort.by(sortBy));
-//            responseEntity = furnitureService.getAllOrdersByPages(pageable);
-//        } catch(Exception e){
-//            return new ResponseEntity<>(new ResourceNotFoundException("Cannot get the orders"), HttpStatus.NOT_FOUND);
-//        }
-//        return new ResponseEntity<>(responseEntity, HttpStatus.OK);
-//    }
-
     //Update qty and is rejected by admin field
     @PatchMapping(value = "/{orderId}")
     public ResponseEntity<?> updateOrder(@PathVariable Long orderId, @RequestBody Orders orderDetails){
@@ -82,7 +71,7 @@ public class AdminController {
                     return new ResponseEntity<>(new MessageResponse("Product qty cannot be satisfied."), HttpStatus.NOT_FOUND);
                 }
                 product.setProductQty(product.getProductQty() - orderDetails.getQty());
-                productService.updateProduct(product);
+                productService.updateProductQty(product);
             }
             responseEntity = adminService.updateOrderByAdmin(orderId, orderDetails);
 
@@ -103,4 +92,18 @@ public class AdminController {
         }
         return new ResponseEntity<>(responseEntity, HttpStatus.OK);
     }
+
+//    @GetMapping(value = "/page={pageNumber}&sort={sortBy}")
+//    public ResponseEntity<?> getOrders(@PathVariable int pageNumber, @PathVariable String sortBy) {
+//        ResponseEntity<?> responseEntity;
+//        try{
+//            Pageable pageable = PageRequest.of(pageNumber, 5, Sort.by(sortBy));
+//            responseEntity = furnitureService.getAllOrdersByPages(pageable);
+//        } catch(Exception e){
+//            return new ResponseEntity<>(new ResourceNotFoundException("Cannot get the orders"), HttpStatus.NOT_FOUND);
+//        }
+//        return new ResponseEntity<>(responseEntity, HttpStatus.OK);
+//    }
+
+
 }

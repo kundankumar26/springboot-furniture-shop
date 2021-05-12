@@ -1,33 +1,35 @@
 package com.example.furnitureshop.models;
 
+import java.util.List;
+
 public class EmployeeRequest {
-    private long productId;
-    private int qty;
+    private List<Long> productIds;
+    private List<Integer> qty;
     private String address;
     private String phoneNumber;
 
     public EmployeeRequest(){ }
 
-    public EmployeeRequest(long productId, int qty, String address, String phoneNumber) {
-        this.productId = productId;
+    public EmployeeRequest(List<Long> productIds, List<Integer> qty, String address, String phoneNumber) {
+        this.productIds = productIds;
         this.qty = qty;
         this.address = address;
         this.phoneNumber = phoneNumber;
     }
 
-    public long getProductId() {
-        return productId;
+    public List<Long> getProductIds() {
+        return productIds;
     }
 
-    public void setProductId(long productId) {
-        this.productId = productId;
+    public void setProductIds(List<Long> productIds) {
+        this.productIds = productIds;
     }
 
-    public int getQty() {
+    public List<Integer> getQty() {
         return qty;
     }
 
-    public void setQty(int qty) {
+    public void setQty(List<Integer> qty) {
         this.qty = qty;
     }
 
