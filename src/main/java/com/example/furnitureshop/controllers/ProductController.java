@@ -3,17 +3,21 @@ package com.example.furnitureshop.controllers;
 import com.example.furnitureshop.GlobalClassForFunctions;
 import com.example.furnitureshop.models.Comment;
 import com.example.furnitureshop.models.Product;
+import com.example.furnitureshop.models.User;
 import com.example.furnitureshop.payload.response.MessageResponse;
 import com.example.furnitureshop.payload.response.ProductResponse;
 import com.example.furnitureshop.security.services.CommentService;
 import com.example.furnitureshop.security.services.ProductService;
+import com.example.furnitureshop.security.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -25,6 +29,9 @@ public class ProductController {
 
     @Autowired
     private CommentService commentService;
+
+    @Autowired
+    private UserService userService;
 
 
     @GetMapping(value = "/")
@@ -47,7 +54,12 @@ public class ProductController {
                 throw new RuntimeException("Product doesn't exist");
             }
             List<Comment> commentList = commentService.getCommentsByProduct(productId);
-            responseEntity = new ResponseEntity<>(new ProductResponse(product, commentList), HttpStatus.OK);
+            Set<Long> userIds = new HashSet<>();
+            for(Comment comment: commentList){
+                userIds.add(comment.getUserId());
+            }
+            List<User> users = userService.findUsersByIds(userIds);
+            responseEntity = new ResponseEntity<>(new ProductResponse(product, commentList, users), HttpStatus.OK);
         } catch(Exception e){
             return new ResponseEntity<>(new MessageResponse("Cannot get the product"), HttpStatus.NOT_FOUND);
         }
@@ -55,9 +67,10 @@ public class ProductController {
     }
 
     @GetMapping(value = "/{productId}/comments")
-    public ResponseEntity<?> checkIfRatedTheProduct(@PathVariable long productId){
+    public ResponseEntity<?> checkIfRatedTheProduct(@PathVariable(value = "productId") String productid){
         ResponseEntity<?> responseEntity = null;
         try {
+            long productId = Long.parseLong(productid);
             long userId = GlobalClassForFunctions.getUserIdFromToken();
             Comment comment = commentService.getCommentByUserId(userId, productId);
             if(comment == null){
@@ -71,9 +84,10 @@ public class ProductController {
     }
 
     @PatchMapping(value = "/{productId}/{commentId}")
-    public ResponseEntity<?> updateComment(@PathVariable long commentId, @RequestBody Comment comment){
+    public ResponseEntity<?> updateComment(@PathVariable(value = "commentId") String commentid, @RequestBody Comment comment){
         ResponseEntity<?> responseEntity = null;
         try{
+            long commentId = Long.parseLong(commentid);
             responseEntity = new ResponseEntity<>(commentService.updateCommentById(commentId, comment), HttpStatus.OK);
         } catch (Exception e){
             return new ResponseEntity<>(new MessageResponse("Cannot update comment"), HttpStatus.NOT_FOUND);
@@ -101,13 +115,13 @@ public class ProductController {
 
     @PostMapping(value = "/")
     @PreAuthorize("hasRole('VENDOR')")
-    public ResponseEntity<?> createProduct(@PathVariable String userIdString, @RequestBody Product product) {
+    public ResponseEntity<?> createProduct(@RequestBody Product product) {
         ResponseEntity<?> responseEntity;
         try {
-            int userId = Integer.parseInt(userIdString);
+            long userId = GlobalClassForFunctions.getUserIdFromToken();
             responseEntity = productService.createProduct(userId, product);
         } catch(Exception e){
-            return new ResponseEntity<>(new MessageResponse("Cannot create the product by userid: " + userIdString), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new MessageResponse("Cannot create the product by user"), HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(responseEntity, HttpStatus.OK);
     }

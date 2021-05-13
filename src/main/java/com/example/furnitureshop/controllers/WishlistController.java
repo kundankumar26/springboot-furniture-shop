@@ -1,10 +1,10 @@
 package com.example.furnitureshop.controllers;
 
 import com.example.furnitureshop.GlobalClassForFunctions;
+import com.example.furnitureshop.models.Product;
 import com.example.furnitureshop.payload.response.MessageResponse;
 import com.example.furnitureshop.security.services.WishlistService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -31,12 +31,12 @@ public class WishlistController {
         return new ResponseEntity<>(responseEntity, HttpStatus.OK);
     }
 
-    @PostMapping(value = "/{productId}")
-    public ResponseEntity<?> addProductToWishlist(@PathVariable(value = "productId") String productid) {
+    @PostMapping(value = "/")
+    public ResponseEntity<?> addProductToWishlist(@RequestBody Product product) {
         ResponseEntity<?> responseEntity = null;
         try {
             long userId = GlobalClassForFunctions.getUserIdFromToken();
-            long productId = Long.parseLong(productid);
+            long productId = product.getProductId();
             responseEntity = new ResponseEntity<>(wishlistService.addProductToWishlist(userId, productId), HttpStatus.OK);
         } catch(Exception e){
             return new ResponseEntity<>(new MessageResponse("Failed to add to wishlist"), HttpStatus.NOT_FOUND);

@@ -1,6 +1,8 @@
 package com.example.furnitureshop.repository;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import com.example.furnitureshop.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -26,5 +28,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
     long findEmpIdByUsername(@Param(value = "userName") String username);
 
     @Query(value = "SELECT * FROM user_roles WHERE user_id=:userId and role_id=2", nativeQuery = true)
-    Object findByUserId(@Param(value = "userId") int userId);
+    Object findByUserId(@Param(value = "userId") long userId);
+
+    @Query(value = "SELECT * FROM perpendicular_db.users WHERE id IN :userId",
+            nativeQuery = true)
+    List<User> findUsersByIds(@Param(value = "userId") Set<Long> userIds);
 }
+
+//emp_first_name, emp_last_name, email, emp_id, username

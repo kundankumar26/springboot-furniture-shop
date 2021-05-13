@@ -32,7 +32,7 @@ public class ProductService {
     }
 
     //Create a product by vendor only
-    public ResponseEntity<?> createProduct(int userId, Product product) {
+    public ResponseEntity<?> createProduct(long userId, Product product) {
         Object user = userRepository.findByUserId(userId);
         if(user==null){
             throw new RuntimeException("Cannot find vendor with id: " + userId);
