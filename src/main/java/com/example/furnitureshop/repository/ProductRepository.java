@@ -12,7 +12,9 @@ import java.util.Set;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-
     @Query(value = "SELECT * FROM products WHERE product_id IN :productIds ORDER BY product_id", nativeQuery = true)
     List<Product> findProductsForCart(@Param(value = "productIds") Set<Long> productIds);
+
+    @Query(value = "SELECT * FROM products ORDER BY product_id", nativeQuery = true)
+    List<Product> findALlProducts();
 }

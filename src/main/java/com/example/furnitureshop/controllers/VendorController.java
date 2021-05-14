@@ -23,9 +23,6 @@ public class VendorController {
     private VendorService vendorService;
 
     @Autowired
-    private FurnitureService furnitureService;
-
-    @Autowired
     private AddressService addressService;
 
     @Autowired

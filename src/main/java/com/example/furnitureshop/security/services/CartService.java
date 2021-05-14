@@ -36,6 +36,11 @@ public class CartService {
         return new ResponseEntity<>(new CartResponse(cartList, productList), HttpStatus.OK);
     }
 
+    //Get all item name from cart for user
+    public List<Cart> getOrdersForUser(long userId) {
+        return cartRepository.getAllOrdersFromCart(userId);
+    }
+
     //Add item to user's cart
     public Cart addOrderToCart(long userId, long productId) {
         if(productService.findProductById(productId) == null){
@@ -43,7 +48,7 @@ public class CartService {
         }
         Cart cart = cartRepository.findByProductId(userId, productId);
         if(cart != null){
-            cartRepository.delete(cart);
+            //cartRepository.delete(cart);
             return null;
         }
         return cartRepository.save(new Cart(userId, productId));

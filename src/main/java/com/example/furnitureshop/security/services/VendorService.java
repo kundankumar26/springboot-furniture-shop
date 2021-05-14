@@ -1,9 +1,7 @@
 package com.example.furnitureshop.security.services;
 
-import com.example.furnitureshop.GlobalClassForFunctions;
 import com.example.furnitureshop.exceptions.ResourceNotFoundException;
 import com.example.furnitureshop.models.EmployeeResponseTable;
-import com.example.furnitureshop.models.Order;
 import com.example.furnitureshop.models.Orders;
 import com.example.furnitureshop.repository.FurnituresRepository;
 import com.example.furnitureshop.repository.VendorRepository;
@@ -11,8 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import java.util.Date;
 
 @Service
 public class VendorService {

@@ -1,23 +1,15 @@
 package com.example.furnitureshop.controllers;
 
-import com.example.furnitureshop.exceptions.ResourceNotFoundException;
-import com.example.furnitureshop.models.Order;
 import com.example.furnitureshop.models.Orders;
 import com.example.furnitureshop.models.Product;
 import com.example.furnitureshop.payload.response.MessageResponse;
 import com.example.furnitureshop.security.services.AdminService;
-import com.example.furnitureshop.security.services.FurnitureService;
 import com.example.furnitureshop.security.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
 
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -25,9 +17,6 @@ import java.util.ArrayList;
 @PreAuthorize("hasRole('ADMIN')")
 @RequestMapping("/admin")
 public class AdminController {
-
-    @Autowired
-    private FurnitureService furnitureService;
 
     @Autowired
     private AdminService adminService;

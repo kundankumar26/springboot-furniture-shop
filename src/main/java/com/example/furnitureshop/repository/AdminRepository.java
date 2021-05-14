@@ -1,8 +1,6 @@
 package com.example.furnitureshop.repository;
 
 import com.example.furnitureshop.models.AdminResponse;
-import com.example.furnitureshop.models.EmployeeResponseTable;
-import com.example.furnitureshop.models.Order;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

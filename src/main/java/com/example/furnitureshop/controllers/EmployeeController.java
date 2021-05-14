@@ -53,8 +53,6 @@ public class EmployeeController {
 
 
 
-    @Autowired
-    private FurnitureService furnitureService;
 
     @Autowired
     private JavaMailSender javaMailSender;
@@ -210,8 +208,4 @@ public class EmployeeController {
 //    }
 
 
-    private long getCurrentEmployeeId(){
-        String username = GlobalClassForFunctions.getUserNameFromToken();
-        return Long.parseLong(String.valueOf(furnitureService.findEmpIdByUsername(username).getBody()));
-    }
 }

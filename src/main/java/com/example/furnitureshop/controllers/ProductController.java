@@ -38,9 +38,14 @@ public class ProductController {
     public ResponseEntity<?> findAllProducts() {
         ResponseEntity<?> responseEntity;
         try {
-            responseEntity = productService.findAllProducts();
+            long userId = GlobalClassForFunctions.getUserIdFromToken();
+            responseEntity = productService.findProductsForUser(userId);
         } catch(Exception e){
-            return new ResponseEntity<>(new MessageResponse("Cannot get the products"), HttpStatus.NOT_FOUND);
+            try {
+                responseEntity = productService.findAllProducts();
+            } catch (Exception e1){
+                return new ResponseEntity<>(new MessageResponse("Failed to get the products"), HttpStatus.NOT_FOUND);
+            }
         }
         return new ResponseEntity<>(responseEntity, HttpStatus.OK);
     }
@@ -50,9 +55,6 @@ public class ProductController {
         ResponseEntity<?> responseEntity;
         try {
             Product product = productService.findProductById(productId);
-            if(product == null){
-                throw new RuntimeException("Product doesn't exist");
-            }
             List<Comment> commentList = commentService.getCommentsByProduct(productId);
             Set<Long> userIds = new HashSet<>();
             for(Comment comment: commentList){
@@ -89,6 +91,7 @@ public class ProductController {
         try{
             long commentId = Long.parseLong(commentid);
             responseEntity = new ResponseEntity<>(commentService.updateCommentById(commentId, comment), HttpStatus.OK);
+            productService.updateProductRating(comment.getProductId(), comment.getRating());
         } catch (Exception e){
             return new ResponseEntity<>(new MessageResponse("Cannot update comment"), HttpStatus.NOT_FOUND);
         }
@@ -100,13 +103,9 @@ public class ProductController {
     public ResponseEntity<?> addCommentToProduct(@RequestBody Comment comment) {
         ResponseEntity<?> responseEntity;
         try {
-            Product product = productService.findProductById(comment.getProductId());
-            if(product == null){
-                throw new RuntimeException("Cannot create the comment");
-            }
             long userId = GlobalClassForFunctions.getUserIdFromToken();
             responseEntity = new ResponseEntity<>(commentService.createComment(userId, comment), HttpStatus.OK);
-            productService.updateProductRating(product, comment.getRating());
+            productService.updateProductRating(comment.getProductId(), comment.getRating());
         } catch(Exception e){
             return new ResponseEntity<>(new MessageResponse("Cannot create the comment"), HttpStatus.NOT_FOUND);
         }

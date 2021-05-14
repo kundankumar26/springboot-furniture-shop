@@ -35,4 +35,8 @@ public class CommentService {
     public Comment getCommentByUserId(long userId, long productId){
         return commentRepository.findIfRated(userId, productId);
     }
+
+    public double getRatingFromComments(long productId) {
+        return commentRepository.getRatingFromComments(productId);
+    }
 }

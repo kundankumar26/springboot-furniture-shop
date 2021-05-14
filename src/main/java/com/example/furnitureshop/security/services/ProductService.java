@@ -1,9 +1,8 @@
 package com.example.furnitureshop.security.services;
 
 import com.example.furnitureshop.exceptions.ResourceNotFoundException;
-import com.example.furnitureshop.models.Comment;
-import com.example.furnitureshop.models.Product;
-import com.example.furnitureshop.models.User;
+import com.example.furnitureshop.models.*;
+import com.example.furnitureshop.payload.response.ProductsForUserResponse;
 import com.example.furnitureshop.repository.ProductRepository;
 import com.example.furnitureshop.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +25,22 @@ public class ProductService {
     @Autowired
     private CommentService commentService;
 
-    //Get all the products
+    @Autowired
+    private CartService cartService;
+
+    @Autowired
+    private WishlistService wishlistService;
+
+    //Get all the products for everyone
     public ResponseEntity<?> findAllProducts() {
         return new ResponseEntity<>(productRepository.findAll(), HttpStatus.OK);
+    }
+
+    //Get all the products for users with roles
+    public ResponseEntity<?> findProductsForUser(long userId) {
+        List<Cart> cartList = cartService.getOrdersForUser(userId);
+        List<Wishlist> wishlists = wishlistService.getWishlistForUser(userId);
+        return new ResponseEntity<>(new ProductsForUserResponse(productRepository.findALlProducts(), cartList, wishlists), HttpStatus.OK);
     }
 
     //Create a product by vendor only
@@ -63,10 +75,13 @@ public class ProductService {
     }
 
     //Update rating of a product
-    public Product updateProductRating(Product product, double rating) {
-        List<Comment> commentList = commentService.getCommentsByProduct(product.getProductId());
-        double totalRating = commentList.size();
-        double productRating = (product.getProductRating() * (totalRating-1) + rating) / totalRating;
+    public Product updateProductRating(long productId, double rating) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("not found"));
+        if(product == null){
+            throw new RuntimeException("Cannot create the comment");
+        }
+        double productRating = commentService.getRatingFromComments(product.getProductId());
         product.setProductRating(productRating);
         return productRepository.save(product);
     }

@@ -2,7 +2,6 @@ package com.example.furnitureshop.security.services;
 
 import com.example.furnitureshop.GlobalClassForFunctions;
 import com.example.furnitureshop.models.EmployeeResponseTable;
-import com.example.furnitureshop.models.Order;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;

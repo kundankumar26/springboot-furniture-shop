@@ -35,6 +35,11 @@ public class WishlistService {
         return new ResponseEntity<>(new WishlistResponse(wishlist, productList), HttpStatus.OK);
     }
 
+    //Get items from wishlist for user
+    public List<Wishlist> getWishlistForUser(long userId) {
+        return wishlistRepository.getProductsFromWishlist(userId);
+    }
+
     //Add product to wishlist
     public Object addProductToWishlist(long userId, long productId) {
 
