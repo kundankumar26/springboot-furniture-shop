@@ -30,7 +30,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query(value = "SELECT * FROM user_roles WHERE user_id=:userId and role_id=2", nativeQuery = true)
     Object findByUserId(@Param(value = "userId") long userId);
 
-    @Query(value = "SELECT * FROM perpendicular_db.users WHERE id IN :userId",
+    @Query(value = "SELECT * FROM users WHERE id IN :userId",
             nativeQuery = true)
     List<User> findUsersByIds(@Param(value = "userId") Set<Long> userIds);
 }
