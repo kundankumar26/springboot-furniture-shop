@@ -107,7 +107,7 @@ public class EmployeeController {
 
             if(ordersList.size() > 0) {
                 responseEntity = new ResponseEntity<>(ordersList, HttpStatus.CREATED);
-                emailSenderService.sendOrderPlacedEmail(createdOrders);
+                //emailSenderService.sendOrderPlacedEmail(createdOrders);
                 cartService.deleteByProductId(currentUserId, productIds);
             } else {
                 return new ResponseEntity<>(new MessageResponse("Product already ordered."), HttpStatus.NOT_FOUND);

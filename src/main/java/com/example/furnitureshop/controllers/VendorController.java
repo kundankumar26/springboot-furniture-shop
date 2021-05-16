@@ -53,7 +53,7 @@ public class VendorController {
         StringBuilder ordersStringBuilder = new StringBuilder();
         try{
             vendorService.updateOrderByVendor(orderId, orderDetails);
-            emailSenderService.sendConfirmedOrderEmail(orderDetails);
+            //emailSenderService.sendConfirmedOrderEmail(orderDetails);
         } catch (RuntimeException runtimeException) {
             return new ResponseEntity<>(new MessageResponse("Shipped date cannot be less than order date"), HttpStatus.BAD_REQUEST);
         } catch (Exception e){
