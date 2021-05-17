@@ -68,7 +68,7 @@ public class AuthController {
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
-        System.out.println(loginRequest.getUsername());
+        System.out.println("logged in user" + loginRequest.getUsername());
         ConfirmationToken confirmationToken = confirmationTokenRepository.findByEmployeeUsername(loginRequest.getUsername());
         if(confirmationToken != null){
             System.out.println("Account not verified.");
@@ -167,10 +167,10 @@ public class AuthController {
         user.setRoles(roles);
         userRepository.save(user);
 
-        ConfirmationToken confirmationToken = new ConfirmationToken(user);
-        confirmationTokenRepository.save(confirmationToken);
+        //ConfirmationToken confirmationToken = new ConfirmationToken(user);
+        //confirmationTokenRepository.save(confirmationToken);
 
-        emailSenderService.sendConfirmationEmail(user.getEmail(), confirmationToken.getConfirmationToken());
+        //emailSenderService.sendConfirmationEmail(user.getEmail(), confirmationToken.getConfirmationToken());
 
 
 //        SimpleMailMessage mailMessage = new SimpleMailMessage();
