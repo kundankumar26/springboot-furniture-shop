@@ -18,6 +18,7 @@ import com.example.furnitureshop.repository.UserRepository;
 import com.example.furnitureshop.security.jwt.JwtUtils;
 import com.example.furnitureshop.security.services.EmailSenderService;
 import com.example.furnitureshop.security.services.UserDetailsImpl;
+import com.example.furnitureshop.security.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -65,6 +66,9 @@ public class AuthController {
     @Autowired
     private JwtUtils jwtUtils;
 
+    @Autowired
+    private UserService userService;
+
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
@@ -95,6 +99,9 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) throws MessagingException {
+
+        userService.isRoleTableEmpty();
+
         if (userRepository.existsByUsername(signUpRequest.getEmpUsername())) {
             return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
         }
